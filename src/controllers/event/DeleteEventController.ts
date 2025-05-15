@@ -5,7 +5,7 @@ import { AppError } from '../../errors/AppError'
 
 class DeleteEventController {
   async handle(req: Request, res: Response) {
-    const event_id = req.params.id
+    const event_id = req.query.event_id as string
     const user_id = req.user_id
 
     const deleteEventService = new DeleteEventService()
