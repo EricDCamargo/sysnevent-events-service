@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "events";
+
 -- CreateEnum
 CREATE TYPE "events"."Course" AS ENUM ('ADS', 'GE', 'GTI', 'GEMP', 'MEC');
 
