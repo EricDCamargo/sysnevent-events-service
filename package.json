@@ -2,7 +2,7 @@
   "name": "sysnevent-events-service",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/SysNevent/sysnevent-events-service.git",
+  "repository": "https://github.com/EricDCamargo/sysnevent-events-service.git",
   "author": "EricDCamargo <ericdcamargo@gmail.com>",
   "license": "MIT",
   "scripts": {
