@@ -14,14 +14,20 @@ class GetEventDetailsService {
       select: {
         id: true,
         name: true,
-        description: true,
-        date: true,
+        category: true,
+        course: true,
+        semester: true,
+        maxParticipants: true,
+        currentParticipants: true,
         location: true,
-        capacity: true,
-        status: true,
-        ownerId: true,
-        createdAt: true,
-        updatedAt: true
+        customLocation: true,
+        speakerName: true,
+        startDate: true,
+        startTime: true,
+        endTime: true,
+        description: true,
+        created_at: true,
+        updated_at: true
       }
     })
 

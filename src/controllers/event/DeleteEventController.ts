@@ -6,12 +6,11 @@ import { AppError } from '../../errors/AppError'
 class DeleteEventController {
   async handle(req: Request, res: Response) {
     const event_id = req.query.event_id as string
-    const user_id = req.user_id
 
     const deleteEventService = new DeleteEventService()
 
     try {
-      const result = await deleteEventService.execute({ event_id, user_id })
+      const result = await deleteEventService.execute({ event_id })
       return res.status(StatusCodes.OK).json(result)
     } catch (error) {
       if (error instanceof AppError) {

@@ -1,19 +1,21 @@
 import { Router } from 'express'
-import { isAuthenticated } from './middlewares/isAuthenticated'
+import { isAuthenticated, isCoordinator } from './middlewares/isAuthenticated'
 import { CreateEventController } from './controllers/event/CreateEventController'
 import { UpdateEventController } from './controllers/event/UpdateEventController'
-import { ListActiveEventsController } from './controllers/event/ListActiveEventsController'
-import { ListMyEventsController } from './controllers/event/ListMyEventsController'
 import { GetEventDetailsController } from './controllers/event/GetEventDetailsController'
 import { DeleteEventController } from './controllers/event/DeleteEventController'
+import { ListEventsController } from './controllers/event/ListEventsController'
+import { CheckUnavailableDatesController } from './controllers/event/CheckUnavailableDatesController'
+import { CheckAvailableTimeSlotsController } from './controllers/event/CheckAvailableTimeSlotsController'
 
 const router = Router()
 
-router.post('/events', isAuthenticated, new CreateEventController().handle)
-router.put('/events', isAuthenticated, new UpdateEventController().handle)
-router.get('/events', new ListActiveEventsController().handle)
-router.get('events/mine', isAuthenticated, new ListMyEventsController().handle)
+router.post('/events', isAuthenticated, isCoordinator, new CreateEventController().handle)
+router.get('/events', new ListEventsController().handle)
 router.get('/events/details', new GetEventDetailsController().handle)
-router.delete('/events', isAuthenticated, new DeleteEventController().handle)
+router.put('/events', isAuthenticated, isCoordinator, new UpdateEventController().handle)
+router.delete('/events', isAuthenticated, isCoordinator, new DeleteEventController().handle)
+router.get('/events/unavailable-dates', isAuthenticated, isCoordinator, new CheckUnavailableDatesController().handle)
+router.get('/events/available-time-slots', isAuthenticated, isCoordinator, new CheckAvailableTimeSlotsController().handle)
 
 export { router }

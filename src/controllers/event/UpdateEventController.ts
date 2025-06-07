@@ -1,31 +1,51 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-
 import { AppError } from '../../errors/AppError'
 import { UpdateEventService } from '../../services/event/UpdateEventService'
 
 class UpdateEventController {
   async handle(req: Request, res: Response) {
     const event_id = req.query.event_id as string
-    const { name, description, date, location, capacity } = req.body
 
-    const user_id = req.user_id
-
-    if (!user_id) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Usuário não autenticado' })
+    if (!event_id) {
+      throw new AppError(
+        'É necessario informar o ID do evento',
+        StatusCodes.BAD_REQUEST
+      )
     }
+
+    const {
+      name,
+      category,
+      course,
+      semester,
+      maxParticipants,
+      location,
+      customLocation,
+      speakerName,
+      startDate,
+      startTime,
+      endTime,
+      description
+    } = req.body
 
     const updateEventService = new UpdateEventService()
 
     try {
       const result = await updateEventService.execute({
         event_id,
-        user_id,
         name,
-        description,
-        date,
+        category,
+        course,
+        semester,
+        maxParticipants,
         location,
-        capacity
+        customLocation,
+        speakerName,
+        startDate,
+        startTime,
+        endTime,
+        description
       })
 
       return res.status(StatusCodes.OK).json(result)

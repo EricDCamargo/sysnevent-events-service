@@ -1,28 +1,40 @@
 import prismaClient from '../../prisma'
 import { AppError } from '../../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
-import { AppResponse } from '../../@types/app.types'
+import { Category, Course, Semester, Location } from '@prisma/client'
 
 interface UpdateEventRequest {
   event_id: string
-  user_id: string
   name?: string
+  category?: Category
+  course?: Course
+  semester?: Semester
+  maxParticipants?: number
+  location?: Location
+  customLocation?: string
+  speakerName?: string
+  startDate?: Date
+  startTime?: Date
+  endTime?: Date
   description?: string
-  date?: string
-  location?: string
-  capacity?: number
 }
 
 class UpdateEventService {
   async execute({
     event_id,
-    user_id,
     name,
-    description,
-    date,
+    category,
+    course,
+    semester,
+    maxParticipants,
     location,
-    capacity
-  }: UpdateEventRequest): Promise<AppResponse> {
+    customLocation,
+    speakerName,
+    startDate,
+    startTime,
+    endTime,
+    description
+  }: UpdateEventRequest) {
     const event = await prismaClient.event.findUnique({
       where: { id: event_id }
     })
@@ -31,10 +43,39 @@ class UpdateEventService {
       throw new AppError('Evento não encontrado!', StatusCodes.NOT_FOUND)
     }
 
-    if (event.ownerId !== user_id) {
+    // Use existing values if not provided
+    const newStartDate = startDate ?? event.startDate
+    const newStartTime = startTime ?? event.startTime
+    const newEndTime = endTime ?? event.endTime
+    const newLocation = location ?? event.location
+
+    // Validate time logic
+    if (newEndTime <= newStartTime) {
       throw new AppError(
-        'Ação não permitida! Você não é o dono deste evento.',
-        StatusCodes.FORBIDDEN
+        'A hora de término deve ser posterior à hora de início.',
+        StatusCodes.BAD_REQUEST
+      )
+    }
+
+    // Check for conflicting events (excluding this event)
+    const conflictingEvents = await prismaClient.event.findMany({
+      where: {
+        id: { not: event_id },
+        location: newLocation,
+        startDate: newStartDate,
+        OR: [
+          {
+            startTime: { lt: newEndTime },
+            endTime: { gt: newStartTime }
+          }
+        ]
+      }
+    })
+
+    if (conflictingEvents.length > 0) {
+      throw new AppError(
+        'O horário selecionado conflita com outro evento já cadastrado.',
+        StatusCodes.CONFLICT
       )
     }
 
@@ -42,22 +83,35 @@ class UpdateEventService {
       where: { id: event_id },
       data: {
         name: name ?? event.name,
-        description: description ?? event.description,
-        date: date ? new Date(date) : event.date,
-        location: location ?? event.location,
-        capacity: capacity ?? event.capacity
+        category: category ?? event.category,
+        course: course ?? event.course,
+        semester: semester ?? event.semester,
+        maxParticipants: maxParticipants ?? event.maxParticipants,
+        location: newLocation,
+        customLocation: customLocation ?? event.customLocation,
+        speakerName: speakerName ?? event.speakerName,
+        startDate: newStartDate,
+        startTime: newStartTime,
+        endTime: newEndTime,
+        description: description ?? event.description
       },
       select: {
         id: true,
         name: true,
-        description: true,
-        date: true,
+        category: true,
+        course: true,
+        semester: true,
+        maxParticipants: true,
+        currentParticipants: true,
         location: true,
-        capacity: true,
-        status: true,
-        ownerId: true,
-        createdAt: true,
-        updatedAt: true
+        customLocation: true,
+        speakerName: true,
+        startDate: true,
+        startTime: true,
+        endTime: true,
+        description: true,
+        created_at: true,
+        updated_at: true
       }
     })
 
