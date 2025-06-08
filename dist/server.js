@@ -10,6 +10,16 @@ const routes_1 = require("./routes");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
+// app.use((req, res, next) => {
+//   console.log('\n--- [MICROSERVIÇO Eventos] Requisição recebida ---')
+//   console.log(`[METHOD] ${req.method}`)
+//   console.log(`[URL] ${req.url}`) // <- importante
+//   console.log(`[ORIGINAL URL] ${req.originalUrl}`) // <- também ajuda
+//   console.log('[HEADERS]', req.headers)
+//   console.log('[BODY]', req.body)
+//   console.log('--------------------------------------------------\n')
+//   next()
+// })
 app.use(routes_1.router);
 app.use((err, req, res, next) => {
     if (err instanceof Error) {

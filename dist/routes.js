@@ -12,10 +12,10 @@ const CheckUnavailableDatesController_1 = require("./controllers/event/CheckUnav
 const CheckAvailableTimeSlotsController_1 = require("./controllers/event/CheckAvailableTimeSlotsController");
 const router = (0, express_1.Router)();
 exports.router = router;
-router.post('/events', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateEventController_1.CreateEventController().handle);
-router.get('/events', new ListEventsController_1.ListEventsController().handle);
-router.get('/events/details', new GetEventDetailsController_1.GetEventDetailsController().handle);
-router.put('/events', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new UpdateEventController_1.UpdateEventController().handle);
-router.delete('/events', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new DeleteEventController_1.DeleteEventController().handle);
-router.get('/events/unavailable-dates', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckUnavailableDatesController_1.CheckUnavailableDatesController().handle);
-router.get('/events/available-time-slots', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckAvailableTimeSlotsController_1.CheckAvailableTimeSlotsController().handle);
+router.post('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateEventController_1.CreateEventController().handle);
+router.get('/', new ListEventsController_1.ListEventsController().handle);
+router.get('/details', new GetEventDetailsController_1.GetEventDetailsController().handle);
+router.put('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new UpdateEventController_1.UpdateEventController().handle);
+router.delete('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new DeleteEventController_1.DeleteEventController().handle);
+router.get('/unavailable-dates', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckUnavailableDatesController_1.CheckUnavailableDatesController().handle);
+router.get('/available-time-slots', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckAvailableTimeSlotsController_1.CheckAvailableTimeSlotsController().handle);
