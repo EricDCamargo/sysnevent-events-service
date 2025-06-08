@@ -1,4 +1,4 @@
-// src/controllers/event/CreateEventController.ts
+import { Location } from '@prisma/client'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
@@ -21,6 +21,32 @@ class CreateEventController {
       description
     } = req.body
 
+    const missingFields = []
+    if (!name) missingFields.push('name')
+    if (!category) missingFields.push('category')
+    if (!course) missingFields.push('course')
+    if (!maxParticipants && maxParticipants !== 0)
+      missingFields.push('maxParticipants')
+    if (!location) missingFields.push('location')
+    if (!speakerName) missingFields.push('speakerName')
+    if (!startDate) missingFields.push('startDate')
+    if (!startTime) missingFields.push('startTime')
+    if (!endTime) missingFields.push('endTime')
+    if (!description) missingFields.push('description')
+
+    if (missingFields.length > 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: `Campos obrigatórios ausentes: ${missingFields.join(', ')}`
+      })
+    }
+
+    const upperLocation = location.toUpperCase() as keyof typeof Location
+    if (!(upperLocation in Location)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: 'Invalid location' })
+    }
+
     const createEventService = new CreateEventService()
 
     try {
@@ -30,7 +56,7 @@ class CreateEventController {
         course,
         semester,
         maxParticipants,
-        location,
+        location: Location[upperLocation],
         customLocation,
         speakerName,
         startDate,

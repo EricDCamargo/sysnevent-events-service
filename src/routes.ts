@@ -10,12 +10,14 @@ import { CheckAvailableTimeSlotsController } from './controllers/event/CheckAvai
 
 const router = Router()
 
-router.post('/events', isAuthenticated, isCoordinator, new CreateEventController().handle)
-router.get('/events', new ListEventsController().handle)
-router.get('/events/details', new GetEventDetailsController().handle)
-router.put('/events', isAuthenticated, isCoordinator, new UpdateEventController().handle)
-router.delete('/events', isAuthenticated, isCoordinator, new DeleteEventController().handle)
-router.get('/events/unavailable-dates', isAuthenticated, isCoordinator, new CheckUnavailableDatesController().handle)
-router.get('/events/available-time-slots', isAuthenticated, isCoordinator, new CheckAvailableTimeSlotsController().handle)
+
+
+router.post('/', isAuthenticated, isCoordinator, new CreateEventController().handle)
+router.get('/', new ListEventsController().handle)
+router.get('/details', new GetEventDetailsController().handle)
+router.put('/', isAuthenticated, isCoordinator, new UpdateEventController().handle)
+router.delete('/', isAuthenticated, isCoordinator, new DeleteEventController().handle)
+router.get('/unavailable-dates', isAuthenticated, isCoordinator, new CheckUnavailableDatesController().handle)
+router.get('/available-time-slots', isAuthenticated, isCoordinator, new CheckAvailableTimeSlotsController().handle)
 
 export { router }

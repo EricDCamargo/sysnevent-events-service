@@ -8,6 +8,17 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
+// app.use((req, res, next) => {
+//   console.log('\n--- [MICROSERVIÇO Eventos] Requisição recebida ---')
+//   console.log(`[METHOD] ${req.method}`)
+//   console.log(`[URL] ${req.url}`) // <- importante
+//   console.log(`[ORIGINAL URL] ${req.originalUrl}`) // <- também ajuda
+//   console.log('[HEADERS]', req.headers)
+//   console.log('[BODY]', req.body)
+//   console.log('--------------------------------------------------\n')
+//   next()
+// })
+
 app.use(router)
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
