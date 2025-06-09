@@ -1,3 +1,4 @@
+import { AppResponse } from '../../@types/app.types'
 import prisma from '../../prisma'
 import { Category } from '@prisma/client'
 
@@ -8,7 +9,7 @@ interface ListEventsFilters {
 }
 
 class ListEventsService {
-  async execute(filters: ListEventsFilters) {
+  async execute(filters: ListEventsFilters): Promise<AppResponse> {
     const { category, startDate, endDate } = filters
 
     const where: any = {}
@@ -30,7 +31,10 @@ class ListEventsService {
       orderBy: { startDate: 'asc' }
     })
 
-    return events
+    return {
+      data: events,
+      message: 'Lista de eventos obtidos com sucesso!'
+    }
   }
 }
 

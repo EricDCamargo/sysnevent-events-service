@@ -33,7 +33,10 @@ class ListEventsService {
                 where,
                 orderBy: { startDate: 'asc' }
             });
-            return events;
+            return {
+                data: events,
+                message: 'Lista de eventos obtidos com sucesso!'
+            };
         });
     }
 }

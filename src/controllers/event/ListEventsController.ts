@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { ListEventsService } from '../../services/event/ListEventsService'
 import { StatusCodes } from 'http-status-codes'
 import { Category } from '@prisma/client'
+import { AppError } from '../../errors/AppError'
 
 class ListEventsController {
   async handle(req: Request, res: Response) {
@@ -12,11 +13,19 @@ class ListEventsController {
       startDate: startDate as string,
       endDate: endDate as string
     }
+    const lsitEventsService = new ListEventsService()
+    try {
+      const events = await lsitEventsService.execute(filters)
+      return res.status(StatusCodes.OK).json(events)
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({ error: error.message })
+      }
 
-    const service = new ListEventsService()
-    const events = await service.execute(filters)
-
-    return res.status(StatusCodes.OK).json(events)
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Erro interno ao buscar detalhes do evento' })
+    }
   }
 }
 
