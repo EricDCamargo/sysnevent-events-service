@@ -59,9 +59,9 @@ class CreateEventController {
         location: Location[upperLocation],
         customLocation,
         speakerName,
-        startDate,
-        startTime,
-        endTime,
+        startDate: new Date(startDate),
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
         description
       })
 

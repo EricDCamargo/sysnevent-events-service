@@ -7,6 +7,7 @@ import { DeleteEventController } from './controllers/event/DeleteEventController
 import { ListEventsController } from './controllers/event/ListEventsController'
 import { CheckUnavailableDatesController } from './controllers/event/CheckUnavailableDatesController'
 import { CheckAvailableTimeSlotsController } from './controllers/event/CheckAvailableTimeSlotsController'
+import { UpdateParticipantCountController } from './controllers/event/UpdateParticipantCountController'
 
 const router = Router()
 
@@ -19,5 +20,5 @@ router.put('/', isAuthenticated, isCoordinator, new UpdateEventController().hand
 router.delete('/', isAuthenticated, isCoordinator, new DeleteEventController().handle)
 router.get('/unavailable-dates', isAuthenticated, isCoordinator, new CheckUnavailableDatesController().handle)
 router.get('/available-time-slots', isAuthenticated, isCoordinator, new CheckAvailableTimeSlotsController().handle)
-
+router.patch('/update-participant-count', new UpdateParticipantCountController().handle)
 export { router }
