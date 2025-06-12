@@ -1,12 +1,10 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["events"]
 }
 
 enum Course {
@@ -15,8 +13,6 @@ enum Course {
   GTI
   GEMP
   MEC
-
-  @@schema("events")
 }
 
 enum Semester {
@@ -26,8 +22,6 @@ enum Semester {
   SEM4
   SEM5
   SEM6
-
-  @@schema("events")
 }
 
 enum Location {
@@ -61,8 +55,6 @@ enum Location {
   SALA_11
   SALA_12
   OUTROS
-
-  @@schema("events")
 }
 
 enum Category {
@@ -71,27 +63,24 @@ enum Category {
   OFICINA
   CURSO
   VISITA_TECNICA
-
-  @@schema("events")
 }
 
 model Event {
   id                  String    @id @default(uuid())
-  name                String
+  name                String    @db.VarChar(100)
   category            Category
   course              Course
   semester            Semester?
   maxParticipants     Int
   currentParticipants Int       @default(0)
   location            Location
-  customLocation      String?
-  speakerName         String
+  customLocation      String?   @db.VarChar(100)
+  speakerName         String    @db.VarChar(60)
   startDate           DateTime
   startTime           DateTime
   endTime             DateTime
-  description         String
+  description         String    @db.VarChar(500)
+  isRestricted        Boolean   @default(false)
   created_at          DateTime  @default(now())
   updated_at          DateTime  @updatedAt
-
-  @@schema("events")
 }
