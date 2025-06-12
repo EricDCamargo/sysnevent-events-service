@@ -1,4 +1,4 @@
-import { Location } from '@prisma/client'
+import { Course, Location, Semester } from '@prisma/client'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
@@ -45,6 +45,20 @@ class CreateEventController {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ error: 'Invalid location' })
+    }
+
+    const upperCourse = course.toUpperCase() as keyof typeof Course
+    if (!(upperCourse in Course)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: 'Invalid course' })
+    }
+
+    const upperSemester = semester.toUpperCase() as keyof typeof Semester
+    if (!(upperSemester in Semester)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: 'Invalid semester' })
     }
 
     const createEventService = new CreateEventService()
