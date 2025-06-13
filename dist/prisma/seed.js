@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __importDefault(require("./index"));
+const _1 = __importDefault(require("."));
 const types_1 = require("../@types/types");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield index_1.default.category.upsert({
+        yield _1.default.category.upsert({
             where: { name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name },
             update: {},
             create: { name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name }
@@ -29,5 +29,5 @@ main()
     process.exit(1);
 })
     .finally(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield index_1.default.$disconnect();
+    yield _1.default.$disconnect();
 }));

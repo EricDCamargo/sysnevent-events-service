@@ -1,4 +1,4 @@
-import prismaClient from './index'
+import prismaClient from '.'
 import { FIXED_CATEGORIES } from '../@types/types'
 
 async function main() {
