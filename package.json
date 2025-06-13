@@ -11,7 +11,7 @@
     "start": "node dist/server.js",
     "vercel-build": "yarn prisma:generate",
     "prisma:generate": "prisma generate && prisma migrate deploy && yarn seed",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.15",
