@@ -10,8 +10,8 @@
     "build": "tsc --build",
     "start": "node dist/server.js",
     "vercel-build": "yarn prisma:generate",
-    "prisma:generate": "prisma generate && prisma migrate deploy && yarn seed",
-    "seed": "ts-node prisma/seed.ts"
+    "prisma:generate": "prisma generate && prisma migrate deploy && node dist/prisma/seed.js",
+    "seed": "ts-node src/prisma/seed.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.15",
