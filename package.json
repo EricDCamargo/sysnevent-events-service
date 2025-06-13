@@ -9,7 +9,7 @@
     "dev": "ts-node-dev src/server.ts",
     "build": "tsc --build",
     "start": "node dist/server.js",
-    "vercel-build": "prisma generate",
+    "vercel-build": "yarn prisma:generate",
     "prisma:generate": "prisma generate && prisma migrate deploy && yarn seed",
     "seed": "ts-node prisma/seed.ts"
   },
