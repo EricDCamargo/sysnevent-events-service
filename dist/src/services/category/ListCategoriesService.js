@@ -12,22 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __importDefault(require("../src/prisma/index"));
-const types_1 = require("../src/@types/types");
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield index_1.default.category.upsert({
-            where: { name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name },
-            update: {},
-            create: { name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name }
+exports.ListCategoriesService = void 0;
+const prisma_1 = __importDefault(require("../../prisma"));
+class ListCategoriesService {
+    execute() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const categories = yield prisma_1.default.category.findMany({
+                orderBy: { name: 'asc' }
+            });
+            return {
+                data: categories,
+                message: 'Categorias listadas com sucesso.'
+            };
         });
-    });
+    }
 }
-main()
-    .catch(e => {
-    console.error('❌ Erro ao rodar seed:', e);
-    process.exit(1);
-})
-    .finally(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield index_1.default.$disconnect();
-}));
+exports.ListCategoriesService = ListCategoriesService;

@@ -1,15 +1,16 @@
 import prismaClient from '../src/prisma/index'
+import { FIXED_CATEGORIES } from '../src/@types/types'
 
 async function main() {
   await prismaClient.category.upsert({
-    where: { name: 'Curso Online' },
+    where: { name: FIXED_CATEGORIES.CURSO_ONLINE.name },
     update: {},
-    create: { name: 'Curso Online' }
+    create: { name: FIXED_CATEGORIES.CURSO_ONLINE.name }
   })
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error('❌ Erro ao rodar seed:', e)
     process.exit(1)
   })
