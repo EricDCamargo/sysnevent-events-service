@@ -18,7 +18,7 @@ const AppError_1 = require("../../errors/AppError");
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateEventService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted }) {
+        return __awaiter(this, arguments, void 0, function* ({ name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration }) {
             const categoryExists = yield prisma_1.default.category.findUnique({
                 where: { id: categoryId }
             });
@@ -66,7 +66,8 @@ class CreateEventService {
                     startTime,
                     endTime,
                     description,
-                    isRestricted
+                    isRestricted,
+                    duration
                 }
             });
             return {

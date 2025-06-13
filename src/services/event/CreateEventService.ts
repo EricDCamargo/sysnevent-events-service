@@ -17,6 +17,7 @@ interface CreateEventRequest {
   endTime: Date
   description: string
   isRestricted?: boolean
+  duration?: number
 }
 
 class CreateEventService {
@@ -33,7 +34,8 @@ class CreateEventService {
     startTime,
     endTime,
     description,
-    isRestricted
+    isRestricted,
+    duration
   }: CreateEventRequest): Promise<AppResponse> {
     const categoryExists = await prismaClient.category.findUnique({
       where: { id: categoryId }
@@ -102,7 +104,8 @@ class CreateEventService {
         startTime,
         endTime,
         description,
-        isRestricted
+        isRestricted,
+        duration
       }
     })
 

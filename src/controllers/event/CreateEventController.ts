@@ -3,6 +3,8 @@ import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
 import { CreateEventService } from '../../services/event/CreateEventService'
+import prismaClient from '../../prisma'
+import { FIXED_CATEGORIES } from '../../@types/types'
 
 class CreateEventController {
   async handle(req: Request, res: Response) {
@@ -19,14 +21,24 @@ class CreateEventController {
       startTime,
       endTime,
       description,
-      isRestricted
+      isRestricted,
+      duration
     } = req.body
+
+    const category = await prismaClient.category.findUnique({
+      where: { id: categoryId }
+    })
+
+    if (!category) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'Categoria informada é inválida'
+      })
+    }
 
     const missingFields = []
     if (!name) missingFields.push('name')
-    if (!categoryId) missingFields.push('categoryId')
     if (!course) missingFields.push('course')
-    if (!maxParticipants && maxParticipants <= 0)
+    if (!maxParticipants || maxParticipants <= 0)
       missingFields.push('maxParticipants')
     if (!location) missingFields.push('location')
     if (!speakerName) missingFields.push('speakerName')
@@ -41,25 +53,36 @@ class CreateEventController {
       })
     }
 
-    const upperLocation = location.toUpperCase() as keyof typeof Location
-    if (!(upperLocation in Location)) {
+    if (!(location in Location)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ error: 'Invalid location' })
+        .json({ error: 'Localização inválida' })
     }
 
-    const upperCourse = course.toUpperCase() as keyof typeof Course
-    if (!(upperCourse in Course)) {
+    if (!(course in Course)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ error: 'Invalid course' })
+        .json({ error: 'Curso inválido' })
     }
 
-    const upperSemester = semester.toUpperCase() as keyof typeof Semester
-    if (!(upperSemester in Semester)) {
+    if (semester && !(semester in Semester)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ error: 'Invalid semester' })
+        .json({ error: 'Semestre inválido' })
+    }
+
+    let finalLocation = location
+    let finalCustomLocation = customLocation
+
+    if (category.name === FIXED_CATEGORIES.CURSO_ONLINE.name) {
+      if (!duration || duration <= 0) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          error:
+            'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
+        })
+      }
+      finalLocation = FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation
+      finalCustomLocation = FIXED_CATEGORIES.CURSO_ONLINE.customLocation
     }
 
     const createEventService = new CreateEventService()
@@ -71,14 +94,15 @@ class CreateEventController {
         course,
         semester,
         maxParticipants,
-        location: Location[upperLocation],
-        customLocation,
+        location: finalLocation,
+        customLocation: finalCustomLocation,
         speakerName,
         startDate: new Date(startDate),
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         description,
-        isRestricted
+        isRestricted,
+        duration
       })
 
       return res.status(StatusCodes.CREATED).json(result)

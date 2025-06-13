@@ -8,19 +8,62 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateEventController = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const AppError_1 = require("../../errors/AppError");
 const UpdateEventService_1 = require("../../services/event/UpdateEventService");
+const prisma_1 = __importDefault(require("../../prisma"));
+const types_1 = require("../../@types/types");
+const client_1 = require("@prisma/client");
 class UpdateEventController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const event_id = req.query.event_id;
+            const { name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration } = req.body;
             if (!event_id) {
                 throw new AppError_1.AppError('É necessario informar o ID do evento', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
-            const { name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted } = req.body;
+            let category = null;
+            if (categoryId) {
+                category = yield prisma_1.default.category.findUnique({
+                    where: { id: categoryId }
+                });
+                if (!category) {
+                    return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                        error: 'Categoria informada é inválida'
+                    });
+                }
+            }
+            if (course && !(course in client_1.Course)) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json({ error: 'Curso inválido' });
+            }
+            if (semester && !(semester in client_1.Semester)) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json({ error: 'Semestre inválido' });
+            }
+            if (location && !(location in Location)) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json({ error: 'Localização inválida' });
+            }
+            let finalLocation = location;
+            let finalCustomLocation = customLocation;
+            if ((category === null || category === void 0 ? void 0 : category.name) === types_1.FIXED_CATEGORIES.CURSO_ONLINE.name) {
+                if (!duration || duration <= 0) {
+                    return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                        error: 'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
+                    });
+                }
+                finalLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation;
+                finalCustomLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.customLocation;
+            }
             const updateEventService = new UpdateEventService_1.UpdateEventService();
             try {
                 const result = yield updateEventService.execute({
@@ -30,14 +73,15 @@ class UpdateEventController {
                     course,
                     semester,
                     maxParticipants,
-                    location,
-                    customLocation,
+                    location: finalLocation,
+                    customLocation: finalCustomLocation,
                     speakerName,
                     startDate,
                     startTime,
                     endTime,
                     description,
-                    isRestricted
+                    isRestricted,
+                    duration
                 });
                 return res.status(http_status_codes_1.StatusCodes.OK).json(result);
             }
