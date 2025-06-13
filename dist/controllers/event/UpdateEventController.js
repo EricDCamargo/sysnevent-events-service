@@ -20,7 +20,7 @@ class UpdateEventController {
             if (!event_id) {
                 throw new AppError_1.AppError('É necessario informar o ID do evento', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
-            const { name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description } = req.body;
+            const { name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted } = req.body;
             const updateEventService = new UpdateEventService_1.UpdateEventService();
             try {
                 const result = yield updateEventService.execute({
@@ -36,7 +36,8 @@ class UpdateEventController {
                     startDate,
                     startTime,
                     endTime,
-                    description
+                    description,
+                    isRestricted
                 });
                 return res.status(http_status_codes_1.StatusCodes.OK).json(result);
             }

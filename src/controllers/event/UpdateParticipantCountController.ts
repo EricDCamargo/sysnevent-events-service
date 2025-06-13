@@ -1,4 +1,3 @@
-// src/controllers/event/UpdateParticipantCountController.ts
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { UpdateParticipantCountService } from '../../services/event/UpdateParticipantCountService'

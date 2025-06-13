@@ -18,7 +18,7 @@ const AppError_1 = require("../../errors/AppError");
 const http_status_codes_1 = require("http-status-codes");
 class UpdateEventService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ event_id, name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description }) {
+        return __awaiter(this, arguments, void 0, function* ({ event_id, name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted }) {
             const event = yield prisma_1.default.event.findUnique({
                 where: { id: event_id }
             });
@@ -65,7 +65,8 @@ class UpdateEventService {
                     startDate: newStartDate,
                     startTime: newStartTime,
                     endTime: newEndTime,
-                    description: description !== null && description !== void 0 ? description : event.description
+                    description: description !== null && description !== void 0 ? description : event.description,
+                    isRestricted: isRestricted !== null && isRestricted !== void 0 ? isRestricted : event.isRestricted
                 },
                 select: {
                     id: true,

@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
 import prismaClient from '../../prisma'
 import { Category, Course, Semester, Location } from '@prisma/client'
+import { AppResponse } from '../../@types/app.types'
 interface CreateEventRequest {
   name: string
   category: Category
@@ -15,6 +16,7 @@ interface CreateEventRequest {
   startTime: Date
   endTime: Date
   description: string
+  isRestricted?: boolean
 }
 
 class CreateEventService {
@@ -30,8 +32,9 @@ class CreateEventService {
     startDate,
     startTime,
     endTime,
-    description
-  }: CreateEventRequest) {
+    description,
+    isRestricted
+  }: CreateEventRequest): Promise<AppResponse> {
     const now = new Date()
 
     if (startDate < now) {
@@ -90,7 +93,8 @@ class CreateEventService {
         startDate,
         startTime,
         endTime,
-        description
+        description,
+        isRestricted
       }
     })
 

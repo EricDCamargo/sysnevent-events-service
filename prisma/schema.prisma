@@ -80,7 +80,7 @@ model Event {
   startTime           DateTime
   endTime             DateTime
   description         String    @db.VarChar(500)
-  isRestricted        Boolean   @default(false)
+  isRestricted        Boolean   @default(true)
   created_at          DateTime  @default(now())
   updated_at          DateTime  @updatedAt
 }

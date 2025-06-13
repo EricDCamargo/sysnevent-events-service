@@ -26,6 +26,7 @@ class GetEventDetailsService {
         startTime: true,
         endTime: true,
         description: true,
+        isRestricted: true,
         created_at: true,
         updated_at: true
       }

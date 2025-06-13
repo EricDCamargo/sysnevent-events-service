@@ -26,7 +26,8 @@ class UpdateEventController {
       startDate,
       startTime,
       endTime,
-      description
+      description,
+      isRestricted
     } = req.body
 
     const updateEventService = new UpdateEventService()
@@ -45,7 +46,8 @@ class UpdateEventController {
         startDate,
         startTime,
         endTime,
-        description
+        description,
+        isRestricted
       })
 
       return res.status(StatusCodes.OK).json(result)

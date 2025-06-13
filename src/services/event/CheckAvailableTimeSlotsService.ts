@@ -1,3 +1,4 @@
+import { AppResponse } from '../../@types/app.types'
 import prisma from '../../prisma'
 import { Location } from '@prisma/client'
 
@@ -10,7 +11,7 @@ function toTimeString(date: Date) {
 }
 
 class CheckAvailableTimeSlotsService {
-  async execute(location: Location, date: string) {
+  async execute(location: Location, date: string): Promise<AppResponse> {
     // Search all events for the given location and date
     const events = await prisma.event.findMany({
       where: {
@@ -55,7 +56,10 @@ class CheckAvailableTimeSlotsService {
       }
     }
 
-    return { availableSlots }
+    return {
+      data: availableSlots,
+      message: 'Lista de intervalos de tempo disponiveis'
+    }
   }
 }
 

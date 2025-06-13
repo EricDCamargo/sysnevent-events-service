@@ -2,6 +2,7 @@ import prismaClient from '../../prisma'
 import { AppError } from '../../errors/AppError'
 import { StatusCodes } from 'http-status-codes'
 import { Category, Course, Semester, Location } from '@prisma/client'
+import { AppResponse } from '../../@types/app.types'
 
 interface UpdateEventRequest {
   event_id: string
@@ -17,6 +18,7 @@ interface UpdateEventRequest {
   startTime?: Date
   endTime?: Date
   description?: string
+  isRestricted?: boolean
 }
 
 class UpdateEventService {
@@ -33,8 +35,9 @@ class UpdateEventService {
     startDate,
     startTime,
     endTime,
-    description
-  }: UpdateEventRequest) {
+    description,
+    isRestricted
+  }: UpdateEventRequest): Promise<AppResponse> {
     const event = await prismaClient.event.findUnique({
       where: { id: event_id }
     })
@@ -93,7 +96,8 @@ class UpdateEventService {
         startDate: newStartDate,
         startTime: newStartTime,
         endTime: newEndTime,
-        description: description ?? event.description
+        description: description ?? event.description,
+        isRestricted: isRestricted ?? event.isRestricted
       },
       select: {
         id: true,

@@ -1,3 +1,4 @@
+import { AppResponse } from '../../@types/app.types'
 import prisma from '../../prisma'
 import { Location } from '@prisma/client'
 
@@ -6,10 +7,14 @@ const DAY_START_HOUR = process.env.DAY_START_HOUR || '00:00'
 const DAY_END_HOUR = process.env.DAY_END_HOUR || '23:59'
 
 class CheckUnavailableDatesService {
-  async execute(location: Location) {
+  async execute(location: Location): Promise<AppResponse> {
     // Search all events for the given location and date
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
     const events = await prisma.event.findMany({
-      where: { location },
+      where: { location, startDate: { gte: today } },
       select: {
         startDate: true,
         startTime: true,
@@ -59,7 +64,7 @@ class CheckUnavailableDatesService {
       if (!hasSlot) unavailableDays.push(day)
     }
 
-    return { unavailableDates: unavailableDays }
+    return { data: unavailableDays, message: 'Lista de datas indisponiveis' }
   }
 }
 

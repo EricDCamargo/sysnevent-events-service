@@ -21,8 +21,10 @@ class CheckUnavailableDatesService {
     execute(location) {
         return __awaiter(this, void 0, void 0, function* () {
             // Search all events for the given location and date
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const events = yield prisma_1.default.event.findMany({
-                where: { location },
+                where: { location, startDate: { gte: today } },
                 select: {
                     startDate: true,
                     startTime: true,
@@ -66,7 +68,7 @@ class CheckUnavailableDatesService {
                 if (!hasSlot)
                     unavailableDays.push(day);
             }
-            return { unavailableDates: unavailableDays };
+            return { data: unavailableDays, message: 'Lista de datas indisponiveis' };
         });
     }
 }

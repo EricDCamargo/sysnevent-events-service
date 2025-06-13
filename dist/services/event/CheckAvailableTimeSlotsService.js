@@ -61,7 +61,10 @@ class CheckAvailableTimeSlotsService {
                     });
                 }
             }
-            return { availableSlots };
+            return {
+                data: availableSlots,
+                message: 'Lista de intervalos de tempo disponiveis'
+            };
         });
     }
 }

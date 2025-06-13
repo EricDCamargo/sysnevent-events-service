@@ -17,7 +17,7 @@ const CreateEventService_1 = require("../../services/event/CreateEventService");
 class CreateEventController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description } = req.body;
+            const { name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted } = req.body;
             const missingFields = [];
             if (!name)
                 missingFields.push('name');
@@ -25,7 +25,7 @@ class CreateEventController {
                 missingFields.push('category');
             if (!course)
                 missingFields.push('course');
-            if (!maxParticipants && maxParticipants !== 0)
+            if (!maxParticipants && maxParticipants <= 0)
                 missingFields.push('maxParticipants');
             if (!location)
                 missingFields.push('location');
@@ -50,6 +50,18 @@ class CreateEventController {
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
                     .json({ error: 'Invalid location' });
             }
+            const upperCourse = course.toUpperCase();
+            if (!(upperCourse in client_1.Course)) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json({ error: 'Invalid course' });
+            }
+            const upperSemester = semester.toUpperCase();
+            if (!(upperSemester in client_1.Semester)) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json({ error: 'Invalid semester' });
+            }
             const createEventService = new CreateEventService_1.CreateEventService();
             try {
                 const result = yield createEventService.execute({
@@ -64,7 +76,8 @@ class CreateEventController {
                     startDate: new Date(startDate),
                     startTime: new Date(startTime),
                     endTime: new Date(endTime),
-                    description
+                    description,
+                    isRestricted
                 });
                 return res.status(http_status_codes_1.StatusCodes.CREATED).json(result);
             }

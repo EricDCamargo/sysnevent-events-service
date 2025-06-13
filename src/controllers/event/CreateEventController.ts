@@ -18,14 +18,15 @@ class CreateEventController {
       startDate,
       startTime,
       endTime,
-      description
+      description,
+      isRestricted
     } = req.body
 
     const missingFields = []
     if (!name) missingFields.push('name')
     if (!category) missingFields.push('category')
     if (!course) missingFields.push('course')
-    if (!maxParticipants && maxParticipants !== 0)
+    if (!maxParticipants && maxParticipants <= 0)
       missingFields.push('maxParticipants')
     if (!location) missingFields.push('location')
     if (!speakerName) missingFields.push('speakerName')
@@ -76,7 +77,8 @@ class CreateEventController {
         startDate: new Date(startDate),
         startTime: new Date(startTime),
         endTime: new Date(endTime),
-        description
+        description,
+        isRestricted
       })
 
       return res.status(StatusCodes.CREATED).json(result)

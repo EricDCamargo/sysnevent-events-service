@@ -18,7 +18,7 @@ const AppError_1 = require("../../errors/AppError");
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateEventService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description }) {
+        return __awaiter(this, arguments, void 0, function* ({ name, category, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted }) {
             const now = new Date();
             if (startDate < now) {
                 throw new AppError_1.AppError('A data de início do evento não pode estar no passado.', http_status_codes_1.StatusCodes.BAD_REQUEST);
@@ -59,7 +59,8 @@ class CreateEventService {
                     startDate,
                     startTime,
                     endTime,
-                    description
+                    description,
+                    isRestricted
                 }
             });
             return {
