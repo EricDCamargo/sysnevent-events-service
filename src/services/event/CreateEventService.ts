@@ -1,11 +1,11 @@
 import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
 import prismaClient from '../../prisma'
-import { Category, Course, Semester, Location } from '@prisma/client'
+import { Course, Semester, Location } from '@prisma/client'
 import { AppResponse } from '../../@types/app.types'
 interface CreateEventRequest {
   name: string
-  category: Category
+  categoryId: string
   course: Course
   semester?: Semester
   maxParticipants: number
@@ -22,7 +22,7 @@ interface CreateEventRequest {
 class CreateEventService {
   async execute({
     name,
-    category,
+    categoryId,
     course,
     semester,
     maxParticipants,
@@ -35,6 +35,14 @@ class CreateEventService {
     description,
     isRestricted
   }: CreateEventRequest): Promise<AppResponse> {
+    const categoryExists = await prismaClient.category.findUnique({
+      where: { id: categoryId }
+    })
+
+    if (!categoryExists) {
+      throw new AppError('Categoria não encontrada.', StatusCodes.BAD_REQUEST)
+    }
+
     const now = new Date()
 
     if (startDate < now) {
@@ -83,7 +91,7 @@ class CreateEventService {
     const event = await prismaClient.event.create({
       data: {
         name,
-        category,
+        categoryId,
         course,
         semester,
         maxParticipants,

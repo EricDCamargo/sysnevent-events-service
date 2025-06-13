@@ -12,32 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ListEventsService = void 0;
+exports.DeleteEventService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
-class ListEventsService {
-    execute(filters) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { categoryId, startDate, endDate } = filters;
-            const where = {};
-            if (categoryId) {
-                where.categoryId = categoryId;
+const AppError_1 = require("../../errors/AppError");
+const http_status_codes_1 = require("http-status-codes");
+class DeleteEventService {
+    execute(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ event_id }) {
+            const event = yield prisma_1.default.event.findUnique({
+                where: { id: event_id }
+            });
+            if (!event) {
+                throw new AppError_1.AppError('Evento não encontrado!', http_status_codes_1.StatusCodes.NOT_FOUND);
             }
-            if (startDate) {
-                where.startDate = { gte: new Date(startDate) };
-            }
-            if (endDate) {
-                where.startDate = where.startDate
-                    ? Object.assign(Object.assign({}, where.startDate), { lte: new Date(endDate) }) : { lte: new Date(endDate) };
-            }
-            const events = yield prisma_1.default.event.findMany({
-                where,
-                orderBy: { startDate: 'asc' }
+            yield prisma_1.default.event.delete({
+                where: { id: event_id }
             });
             return {
-                data: events,
-                message: 'Lista de eventos obtidos com sucesso!'
+                message: 'Evento excluído com sucesso!'
             };
         });
     }
 }
-exports.ListEventsService = ListEventsService;
+exports.DeleteEventService = DeleteEventService;

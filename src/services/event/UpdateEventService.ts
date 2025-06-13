@@ -7,7 +7,7 @@ import { AppResponse } from '../../@types/app.types'
 interface UpdateEventRequest {
   event_id: string
   name?: string
-  category?: Category
+  categoryId?: string
   course?: Course
   semester?: Semester
   maxParticipants?: number
@@ -25,7 +25,7 @@ class UpdateEventService {
   async execute({
     event_id,
     name,
-    category,
+    categoryId,
     course,
     semester,
     maxParticipants,
@@ -86,7 +86,7 @@ class UpdateEventService {
       where: { id: event_id },
       data: {
         name: name ?? event.name,
-        category: category ?? event.category,
+        categoryId: categoryId ?? event.categoryId,
         course: course ?? event.course,
         semester: semester ?? event.semester,
         maxParticipants: maxParticipants ?? event.maxParticipants,
@@ -102,7 +102,7 @@ class UpdateEventService {
       select: {
         id: true,
         name: true,
-        category: true,
+        categoryId: true,
         course: true,
         semester: true,
         maxParticipants: true,

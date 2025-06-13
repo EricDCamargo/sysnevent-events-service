@@ -1,15 +1,14 @@
 import { Request, Response } from 'express'
 import { ListEventsService } from '../../services/event/ListEventsService'
 import { StatusCodes } from 'http-status-codes'
-import { Category } from '@prisma/client'
 import { AppError } from '../../errors/AppError'
 
 class ListEventsController {
   async handle(req: Request, res: Response) {
-    const { category, startDate, endDate } = req.query
+    const { categoryId, startDate, endDate } = req.query
 
     const filters = {
-      category: category as Category,
+      categoryId: categoryId as string,
       startDate: startDate as string,
       endDate: endDate as string
     }

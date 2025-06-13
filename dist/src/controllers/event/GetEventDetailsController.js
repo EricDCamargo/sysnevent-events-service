@@ -9,23 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ListEventsController = void 0;
-const ListEventsService_1 = require("../../services/event/ListEventsService");
+exports.GetEventDetailsController = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const AppError_1 = require("../../errors/AppError");
-class ListEventsController {
+const GetEventDetailsService_1 = require("../../services/event/GetEventDetailsService");
+class GetEventDetailsController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { categoryId, startDate, endDate } = req.query;
-            const filters = {
-                categoryId: categoryId,
-                startDate: startDate,
-                endDate: endDate
-            };
-            const lsitEventsService = new ListEventsService_1.ListEventsService();
+            const event_id = req.query.event_id;
+            const getEventDetailsService = new GetEventDetailsService_1.GetEventDetailsService();
             try {
-                const events = yield lsitEventsService.execute(filters);
-                return res.status(http_status_codes_1.StatusCodes.OK).json(events);
+                const result = yield getEventDetailsService.execute({ event_id });
+                return res.status(http_status_codes_1.StatusCodes.OK).json(result);
             }
             catch (error) {
                 if (error instanceof AppError_1.AppError) {
@@ -38,4 +33,4 @@ class ListEventsController {
         });
     }
 }
-exports.ListEventsController = ListEventsController;
+exports.GetEventDetailsController = GetEventDetailsController;

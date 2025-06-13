@@ -16,7 +16,7 @@ class UpdateEventController {
 
     const {
       name,
-      category,
+      categoryId,
       course,
       semester,
       maxParticipants,
@@ -36,7 +36,7 @@ class UpdateEventController {
       const result = await updateEventService.execute({
         event_id,
         name,
-        category,
+        categoryId,
         course,
         semester,
         maxParticipants,

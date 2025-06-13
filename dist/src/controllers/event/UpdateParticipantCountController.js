@@ -9,33 +9,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ListEventsController = void 0;
-const ListEventsService_1 = require("../../services/event/ListEventsService");
+exports.UpdateParticipantCountController = void 0;
 const http_status_codes_1 = require("http-status-codes");
+const UpdateParticipantCountService_1 = require("../../services/event/UpdateParticipantCountService");
 const AppError_1 = require("../../errors/AppError");
-class ListEventsController {
+class UpdateParticipantCountController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { categoryId, startDate, endDate } = req.query;
-            const filters = {
-                categoryId: categoryId,
-                startDate: startDate,
-                endDate: endDate
-            };
-            const lsitEventsService = new ListEventsService_1.ListEventsService();
+            const { eventId, action } = req.body;
+            if (!eventId || !['increment', 'decrement'].includes(action)) {
+                return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                    error: 'Required fields: eventId and action ("increment" or "decrement")'
+                });
+            }
+            const service = new UpdateParticipantCountService_1.UpdateParticipantCountService();
             try {
-                const events = yield lsitEventsService.execute(filters);
-                return res.status(http_status_codes_1.StatusCodes.OK).json(events);
+                yield service.execute({ eventId, action });
+                return res.status(http_status_codes_1.StatusCodes.OK).json({
+                    message: `currentParticipants ${action}ed com sucesso`
+                });
             }
             catch (error) {
                 if (error instanceof AppError_1.AppError) {
                     return res.status(error.statusCode).json({ error: error.message });
                 }
-                return res
-                    .status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR)
-                    .json({ error: 'Erro interno ao buscar detalhes do evento' });
+                return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
+                    error: 'Erro ao atualizar currentParticipants'
+                });
             }
         });
     }
 }
-exports.ListEventsController = ListEventsController;
+exports.UpdateParticipantCountController = UpdateParticipantCountController;

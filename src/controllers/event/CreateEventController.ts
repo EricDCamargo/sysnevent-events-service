@@ -8,7 +8,7 @@ class CreateEventController {
   async handle(req: Request, res: Response) {
     const {
       name,
-      category,
+      categoryId,
       course,
       semester,
       maxParticipants,
@@ -24,7 +24,7 @@ class CreateEventController {
 
     const missingFields = []
     if (!name) missingFields.push('name')
-    if (!category) missingFields.push('category')
+    if (!categoryId) missingFields.push('categoryId')
     if (!course) missingFields.push('course')
     if (!maxParticipants && maxParticipants <= 0)
       missingFields.push('maxParticipants')
@@ -67,7 +67,7 @@ class CreateEventController {
     try {
       const result = await createEventService.execute({
         name,
-        category,
+        categoryId,
         course,
         semester,
         maxParticipants,

@@ -1,21 +1,20 @@
 import { AppResponse } from '../../@types/app.types'
 import prisma from '../../prisma'
-import { Category } from '@prisma/client'
 
 interface ListEventsFilters {
-  category?: Category
+  categoryId?: string
   startDate?: string
   endDate?: string
 }
 
 class ListEventsService {
   async execute(filters: ListEventsFilters): Promise<AppResponse> {
-    const { category, startDate, endDate } = filters
+    const { categoryId, startDate, endDate } = filters
 
     const where: any = {}
 
-    if (category) {
-      where.category = category
+    if (categoryId) {
+      where.categoryId = categoryId
     }
     if (startDate) {
       where.startDate = { gte: new Date(startDate) }
