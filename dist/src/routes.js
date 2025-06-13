@@ -17,7 +17,6 @@ const ListCategoriesController_1 = require("./controllers/category/ListCategorie
 const UpdateCategoryController_1 = require("./controllers/category/UpdateCategoryController");
 const router = (0, express_1.Router)();
 exports.router = router;
-// Event routes
 router.post('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateEventController_1.CreateEventController().handle);
 router.get('/', new ListEventsController_1.ListEventsController().handle);
 router.get('/details', new GetEventDetailsController_1.GetEventDetailsController().handle);
@@ -26,7 +25,6 @@ router.delete('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordi
 router.get('/unavailable-dates', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckUnavailableDatesController_1.CheckUnavailableDatesController().handle);
 router.get('/available-time-slots', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckAvailableTimeSlotsController_1.CheckAvailableTimeSlotsController().handle);
 router.patch('/update-participant-count', new UpdateParticipantCountController_1.UpdateParticipantCountController().handle);
-// Category routes
 router.get('/categories', new ListCategoriesController_1.ListCategoriesController().handle);
 router.post('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new CreateCategoryController_1.CreateCategoryController().handle);
 router.put('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new UpdateCategoryController_1.UpdateCategoryController().handle);

@@ -70,9 +70,14 @@ class CreateEventController {
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
                     .json({ error: 'Semestre inválido' });
             }
+            const fixedCursoOnline = yield prisma_1.default.category.findFirst({
+                where: {
+                    name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name
+                }
+            });
             let finalLocation = location;
             let finalCustomLocation = customLocation;
-            if (category.name === types_1.FIXED_CATEGORIES.CURSO_ONLINE.name) {
+            if (fixedCursoOnline && category.id === fixedCursoOnline.id) {
                 if (!duration || duration <= 0) {
                     return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                         error: 'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'

@@ -15,8 +15,6 @@ import { UpdateCategoryController } from './controllers/category/UpdateCategoryC
 
 const router = Router()
 
-
-// Event routes
 router.post('/', isAuthenticated, isCoordinator, new CreateEventController().handle)
 router.get('/', new ListEventsController().handle)
 router.get('/details', new GetEventDetailsController().handle)
@@ -26,8 +24,6 @@ router.get('/unavailable-dates', isAuthenticated, isCoordinator, new CheckUnavai
 router.get('/available-time-slots', isAuthenticated, isCoordinator, new CheckAvailableTimeSlotsController().handle)
 router.patch('/update-participant-count', new UpdateParticipantCountController().handle)
 
-
-// Category routes
 router.get('/categories', new ListCategoriesController().handle)
 router.post('/categories', isAuthenticated, isAdmin, new CreateCategoryController().handle)
 router.put('/categories', isAuthenticated, isAdmin, new UpdateCategoryController().handle)

@@ -53,9 +53,14 @@ class UpdateEventController {
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
                     .json({ error: 'Localização inválida' });
             }
+            const fixedCursoOnline = yield prisma_1.default.category.findFirst({
+                where: {
+                    name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name
+                }
+            });
             let finalLocation = location;
             let finalCustomLocation = customLocation;
-            if ((category === null || category === void 0 ? void 0 : category.name) === types_1.FIXED_CATEGORIES.CURSO_ONLINE.name) {
+            if (category && fixedCursoOnline && category.id === fixedCursoOnline.id) {
                 if (!duration || duration <= 0) {
                     return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                         error: 'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
