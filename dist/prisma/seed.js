@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __importDefault(require("../src/prisma/index"));
-const types_1 = require("../src/@types/types");
+const index_1 = __importDefault(require("./index"));
+const types_1 = require("../@types/types");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield index_1.default.category.upsert({

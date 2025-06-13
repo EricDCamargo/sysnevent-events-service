@@ -1,5 +1,5 @@
-import prismaClient from '../src/prisma/index'
-import { FIXED_CATEGORIES } from '../src/@types/types'
+import prismaClient from './index'
+import { FIXED_CATEGORIES } from '../@types/types'
 
 async function main() {
   await prismaClient.category.upsert({
