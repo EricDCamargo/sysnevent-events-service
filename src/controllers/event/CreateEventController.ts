@@ -71,10 +71,16 @@ class CreateEventController {
         .json({ error: 'Semestre inválido' })
     }
 
+    const fixedCursoOnline = await prismaClient.category.findFirst({
+      where: {
+        name: FIXED_CATEGORIES.CURSO_ONLINE.name
+      }
+    })
+
     let finalLocation = location
     let finalCustomLocation = customLocation
 
-    if (category.name === FIXED_CATEGORIES.CURSO_ONLINE.name) {
+    if (fixedCursoOnline && category.id === fixedCursoOnline.id) {
       if (!duration || duration <= 0) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           error:
