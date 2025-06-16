@@ -35,17 +35,36 @@ class CreateEventController {
       })
     }
 
+    const fixedCursoOnline = await prismaClient.category.findFirst({
+      where: {
+        name: FIXED_CATEGORIES.CURSO_ONLINE.name
+      }
+    })
+
+    const isCursoOnline =
+      fixedCursoOnline && category.id === fixedCursoOnline.id
+
+    // Monta lista de campos obrigatórios
     const missingFields = []
     if (!name) missingFields.push('name')
     if (!course) missingFields.push('course')
     if (!maxParticipants || maxParticipants <= 0)
       missingFields.push('maxParticipants')
-    if (!location) missingFields.push('location')
     if (!speakerName) missingFields.push('speakerName')
     if (!startDate) missingFields.push('startDate')
     if (!startTime) missingFields.push('startTime')
     if (!endTime) missingFields.push('endTime')
     if (!description) missingFields.push('description')
+
+    // Validação condicional de location
+    if (!isCursoOnline && !location) {
+      missingFields.push('location')
+    }
+
+    // Se location for OUTROS, customLocation vira obrigatório
+    if (!isCursoOnline && location === 'OUTROS' && !customLocation) {
+      missingFields.push('customLocation')
+    }
 
     if (missingFields.length > 0) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -53,12 +72,7 @@ class CreateEventController {
       })
     }
 
-    if (!(location in Location)) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ error: 'Localização inválida' })
-    }
-
+    // Validação de enums
     if (!(course in Course)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -71,26 +85,55 @@ class CreateEventController {
         .json({ error: 'Semestre inválido' })
     }
 
-    const fixedCursoOnline = await prismaClient.category.findFirst({
-      where: {
-        name: FIXED_CATEGORIES.CURSO_ONLINE.name
-      }
-    })
+    if (!isCursoOnline && !(location in Location)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: 'Localização inválida' })
+    }
 
+    // Parse de datas
+    const parsedStartDate = new Date(startDate)
+    const parsedStartTime = new Date(startTime)
+    const parsedEndTime = new Date(endTime)
+
+    if (
+      isNaN(parsedStartDate.getTime()) ||
+      isNaN(parsedStartTime.getTime()) ||
+      isNaN(parsedEndTime.getTime())
+    ) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'startDate, startTime e endTime precisam ser DateTimes válidos'
+      })
+    }
+
+    // Garantir que startTime e endTime estejam no mesmo dia que startDate
+    const dateString = parsedStartDate.toDateString()
+    if (
+      parsedStartTime.toDateString() !== dateString ||
+      parsedEndTime.toDateString() !== dateString
+    ) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: 'startTime e endTime precisam estar no mesmo dia do startDate'
+      })
+    }
+
+    // Regras específicas para Curso Online
     let finalLocation = location
     let finalCustomLocation = customLocation
 
-    if (fixedCursoOnline && category.id === fixedCursoOnline.id) {
+    if (isCursoOnline) {
       if (!duration || duration <= 0) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           error:
             'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
         })
       }
+
       finalLocation = FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation
       finalCustomLocation = FIXED_CATEGORIES.CURSO_ONLINE.customLocation
     }
 
+    // Chamada ao Service
     const createEventService = new CreateEventService()
 
     try {
@@ -103,9 +146,9 @@ class CreateEventController {
         location: finalLocation,
         customLocation: finalCustomLocation,
         speakerName,
-        startDate: new Date(startDate),
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
+        startDate: parsedStartDate,
+        startTime: parsedStartTime,
+        endTime: parsedEndTime,
         description,
         isRestricted,
         duration

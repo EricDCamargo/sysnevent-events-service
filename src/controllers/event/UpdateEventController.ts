@@ -83,6 +83,68 @@ class UpdateEventController {
       finalCustomLocation = FIXED_CATEGORIES.CURSO_ONLINE.customLocation
     }
 
+    // Buscar o startDate atual se necessário
+    let currentStartDate: Date | undefined = undefined
+
+    if (startTime || endTime) {
+      if (startDate) {
+        const parsedStartDate = new Date(startDate)
+        if (isNaN(parsedStartDate.getTime())) {
+          return res.status(StatusCodes.BAD_REQUEST).json({
+            error: 'startDate inválido. Precisa ser um DateTime válido.'
+          })
+        }
+        currentStartDate = parsedStartDate
+      } else {
+        const existingEvent = await prismaClient.event.findUnique({
+          where: { id: event_id },
+          select: { startDate: true }
+        })
+
+        if (!existingEvent) {
+          return res.status(StatusCodes.NOT_FOUND).json({
+            error: 'Evento não encontrado'
+          })
+        }
+
+        currentStartDate = existingEvent.startDate
+      }
+
+      // Validação do startTime
+      if (startTime) {
+        const parsedStartTime = new Date(startTime)
+        if (isNaN(parsedStartTime.getTime())) {
+          return res.status(StatusCodes.BAD_REQUEST).json({
+            error: 'startTime inválido. Precisa ser um DateTime válido.'
+          })
+        }
+
+        if (
+          parsedStartTime.toDateString() !== currentStartDate.toDateString()
+        ) {
+          return res.status(StatusCodes.BAD_REQUEST).json({
+            error: 'startTime precisa ser no mesmo dia do startDate.'
+          })
+        }
+      }
+
+      // Validação do endTime
+      if (endTime) {
+        const parsedEndTime = new Date(endTime)
+        if (isNaN(parsedEndTime.getTime())) {
+          return res.status(StatusCodes.BAD_REQUEST).json({
+            error: 'endTime inválido. Precisa ser um DateTime válido.'
+          })
+        }
+
+        if (parsedEndTime.toDateString() !== currentStartDate.toDateString()) {
+          return res.status(StatusCodes.BAD_REQUEST).json({
+            error: 'endTime precisa ser no mesmo dia do startDate.'
+          })
+        }
+      }
+    }
+
     const updateEventService = new UpdateEventService()
 
     try {
