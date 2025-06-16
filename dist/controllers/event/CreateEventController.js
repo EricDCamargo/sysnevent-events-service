@@ -31,6 +31,13 @@ class CreateEventController {
                     error: 'Categoria informada é inválida'
                 });
             }
+            const fixedCursoOnline = yield prisma_1.default.category.findFirst({
+                where: {
+                    name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name
+                }
+            });
+            const isCursoOnline = fixedCursoOnline && category.id === fixedCursoOnline.id;
+            // Monta lista de campos obrigatórios
             const missingFields = [];
             if (!name)
                 missingFields.push('name');
@@ -38,8 +45,6 @@ class CreateEventController {
                 missingFields.push('course');
             if (!maxParticipants || maxParticipants <= 0)
                 missingFields.push('maxParticipants');
-            if (!location)
-                missingFields.push('location');
             if (!speakerName)
                 missingFields.push('speakerName');
             if (!startDate)
@@ -50,16 +55,20 @@ class CreateEventController {
                 missingFields.push('endTime');
             if (!description)
                 missingFields.push('description');
+            // Validação condicional de location
+            if (!isCursoOnline && !location) {
+                missingFields.push('location');
+            }
+            // Se location for OUTROS, customLocation vira obrigatório
+            if (!isCursoOnline && location === 'OUTROS' && !customLocation) {
+                missingFields.push('customLocation');
+            }
             if (missingFields.length > 0) {
                 return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                     error: `Campos obrigatórios ausentes: ${missingFields.join(', ')}`
                 });
             }
-            if (!(location in client_1.Location)) {
-                return res
-                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
-                    .json({ error: 'Localização inválida' });
-            }
+            // Validação de enums
             if (!(course in client_1.Course)) {
                 return res
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
@@ -70,14 +79,34 @@ class CreateEventController {
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
                     .json({ error: 'Semestre inválido' });
             }
-            const fixedCursoOnline = yield prisma_1.default.category.findFirst({
-                where: {
-                    name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name
-                }
-            });
+            if (!isCursoOnline && !(location in client_1.Location)) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json({ error: 'Localização inválida' });
+            }
+            // Parse de datas
+            const parsedStartDate = new Date(startDate);
+            const parsedStartTime = new Date(startTime);
+            const parsedEndTime = new Date(endTime);
+            if (isNaN(parsedStartDate.getTime()) ||
+                isNaN(parsedStartTime.getTime()) ||
+                isNaN(parsedEndTime.getTime())) {
+                return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                    error: 'startDate, startTime e endTime precisam ser DateTimes válidos'
+                });
+            }
+            // Garantir que startTime e endTime estejam no mesmo dia que startDate
+            const dateString = parsedStartDate.toDateString();
+            if (parsedStartTime.toDateString() !== dateString ||
+                parsedEndTime.toDateString() !== dateString) {
+                return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                    error: 'startTime e endTime precisam estar no mesmo dia do startDate'
+                });
+            }
+            // Regras específicas para Curso Online
             let finalLocation = location;
             let finalCustomLocation = customLocation;
-            if (fixedCursoOnline && category.id === fixedCursoOnline.id) {
+            if (isCursoOnline) {
                 if (!duration || duration <= 0) {
                     return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                         error: 'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
@@ -86,6 +115,7 @@ class CreateEventController {
                 finalLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation;
                 finalCustomLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.customLocation;
             }
+            // Chamada ao Service
             const createEventService = new CreateEventService_1.CreateEventService();
             try {
                 const result = yield createEventService.execute({
@@ -97,9 +127,9 @@ class CreateEventController {
                     location: finalLocation,
                     customLocation: finalCustomLocation,
                     speakerName,
-                    startDate: new Date(startDate),
-                    startTime: new Date(startTime),
-                    endTime: new Date(endTime),
+                    startDate: parsedStartDate,
+                    startTime: parsedStartTime,
+                    endTime: parsedEndTime,
                     description,
                     isRestricted,
                     duration

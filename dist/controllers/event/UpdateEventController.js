@@ -25,7 +25,7 @@ class UpdateEventController {
             const event_id = req.query.event_id;
             const { name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration } = req.body;
             if (!event_id) {
-                throw new AppError_1.AppError('É necessario informar o ID do evento', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                throw new AppError_1.AppError('É necessário informar o ID do evento', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
             let category = null;
             if (categoryId) {
@@ -48,7 +48,7 @@ class UpdateEventController {
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
                     .json({ error: 'Semestre inválido' });
             }
-            if (location && !(location in Location)) {
+            if (location && !(location in client_1.Location)) {
                 return res
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
                     .json({ error: 'Localização inválida' });
@@ -58,9 +58,12 @@ class UpdateEventController {
                     name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name
                 }
             });
+            const isCursoOnline = category &&
+                fixedCursoOnline &&
+                category.id === fixedCursoOnline.id;
             let finalLocation = location;
             let finalCustomLocation = customLocation;
-            if (category && fixedCursoOnline && category.id === fixedCursoOnline.id) {
+            if (isCursoOnline) {
                 if (!duration || duration <= 0) {
                     return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                         error: 'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
@@ -68,6 +71,70 @@ class UpdateEventController {
                 }
                 finalLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation;
                 finalCustomLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.customLocation;
+            }
+            else {
+                if (location === 'OUTROS') {
+                    if (!customLocation) {
+                        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                            error: 'Para eventos com localização "OUTROS", é necessário preencher o campo customLocation.'
+                        });
+                    }
+                    finalCustomLocation = customLocation;
+                }
+                else {
+                    finalCustomLocation = null;
+                }
+            }
+            // Obter startDate atual para validação de horário
+            let currentStartDate = undefined;
+            if (startTime || endTime) {
+                if (startDate) {
+                    const parsedStartDate = new Date(startDate);
+                    if (isNaN(parsedStartDate.getTime())) {
+                        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                            error: 'startDate inválido. Precisa ser um DateTime válido.'
+                        });
+                    }
+                    currentStartDate = parsedStartDate;
+                }
+                else {
+                    const existingEvent = yield prisma_1.default.event.findUnique({
+                        where: { id: event_id },
+                        select: { startDate: true }
+                    });
+                    if (!existingEvent) {
+                        return res.status(http_status_codes_1.StatusCodes.NOT_FOUND).json({
+                            error: 'Evento não encontrado'
+                        });
+                    }
+                    currentStartDate = existingEvent.startDate;
+                }
+                if (startTime) {
+                    const parsedStartTime = new Date(startTime);
+                    if (isNaN(parsedStartTime.getTime())) {
+                        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                            error: 'startTime inválido. Precisa ser um DateTime válido.'
+                        });
+                    }
+                    if (parsedStartTime.toDateString() !== currentStartDate.toDateString()) {
+                        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                            error: 'startTime precisa ser no mesmo dia do startDate.'
+                        });
+                    }
+                }
+                if (endTime) {
+                    const parsedEndTime = new Date(endTime);
+                    if (isNaN(parsedEndTime.getTime())) {
+                        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                            error: 'endTime inválido. Precisa ser um DateTime válido.'
+                        });
+                    }
+                    if (parsedEndTime.toDateString() !== currentStartDate.toDateString()) {
+                        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                            error: 'endTime precisa ser no mesmo dia do startDate.'
+                        });
+                    }
+                }
             }
             const updateEventService = new UpdateEventService_1.UpdateEventService();
             try {
