@@ -4,7 +4,7 @@ import { AppError } from '../../errors/AppError'
 import { UpdateEventService } from '../../services/event/UpdateEventService'
 import prismaClient from '../../prisma'
 import { FIXED_CATEGORIES } from '../../@types/types'
-import { Course, Semester } from '@prisma/client'
+import { Course, Semester, Location } from '@prisma/client'
 
 class UpdateEventController {
   async handle(req: Request, res: Response) {
@@ -28,7 +28,7 @@ class UpdateEventController {
 
     if (!event_id) {
       throw new AppError(
-        'É necessario informar o ID do evento',
+        'É necessário informar o ID do evento',
         StatusCodes.BAD_REQUEST
       )
     }
@@ -52,11 +52,13 @@ class UpdateEventController {
         .status(StatusCodes.BAD_REQUEST)
         .json({ error: 'Curso inválido' })
     }
+
     if (semester && !(semester in Semester)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ error: 'Semestre inválido' })
     }
+
     if (location && !(location in Location)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
@@ -69,21 +71,39 @@ class UpdateEventController {
       }
     })
 
+    const isCursoOnline =
+      category &&
+      fixedCursoOnline &&
+      category.id === fixedCursoOnline.id
+
     let finalLocation = location
     let finalCustomLocation = customLocation
 
-    if (category && fixedCursoOnline && category.id === fixedCursoOnline.id) {
+    if (isCursoOnline) {
       if (!duration || duration <= 0) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           error:
             'Campo "duration" é obrigatório para eventos do tipo Curso Online e deve ser maior que 0.'
         })
       }
+
       finalLocation = FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation
       finalCustomLocation = FIXED_CATEGORIES.CURSO_ONLINE.customLocation
+    } else {
+      if (location === 'OUTROS') {
+        if (!customLocation) {
+          return res.status(StatusCodes.BAD_REQUEST).json({
+            error:
+              'Para eventos com localização "OUTROS", é necessário preencher o campo customLocation.'
+          })
+        }
+        finalCustomLocation = customLocation
+      } else {
+        finalCustomLocation = null
+      }
     }
 
-    // Buscar o startDate atual se necessário
+    // Obter startDate atual para validação de horário
     let currentStartDate: Date | undefined = undefined
 
     if (startTime || endTime) {
@@ -110,7 +130,6 @@ class UpdateEventController {
         currentStartDate = existingEvent.startDate
       }
 
-      // Validação do startTime
       if (startTime) {
         const parsedStartTime = new Date(startTime)
         if (isNaN(parsedStartTime.getTime())) {
@@ -128,7 +147,6 @@ class UpdateEventController {
         }
       }
 
-      // Validação do endTime
       if (endTime) {
         const parsedEndTime = new Date(endTime)
         if (isNaN(parsedEndTime.getTime())) {
