@@ -6,6 +6,8 @@ import { AppResponse } from '../../@types/app.types'
 interface CreateEventRequest {
   name: string
   categoryId: string
+  description: string
+  banner: string
   course: Course
   semester?: Semester
   maxParticipants: number
@@ -15,7 +17,6 @@ interface CreateEventRequest {
   startDate: Date
   startTime: Date
   endTime: Date
-  description: string
   isRestricted?: boolean
   duration?: number
 }
@@ -23,6 +24,7 @@ interface CreateEventRequest {
 class CreateEventService {
   async execute({
     name,
+    banner,
     categoryId,
     course,
     semester,
@@ -45,11 +47,28 @@ class CreateEventService {
       throw new AppError('Categoria não encontrada.', StatusCodes.BAD_REQUEST)
     }
 
+    const startDateTime = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      startTime.getHours(),
+      startTime.getMinutes(),
+      startTime.getSeconds()
+    )
+
     const now = new Date()
 
-    if (startDate < now) {
+    if (startDateTime < now) {
       throw new AppError(
-        'A data de início do evento não pode estar no passado.',
+        'A data e hora de início do evento não podem estar no passado.',
+        StatusCodes.BAD_REQUEST
+      )
+    }
+
+    const diffMs = endTime.getTime() - startTime.getTime()
+    if (diffMs < 30 * 60 * 1000) {
+      throw new AppError(
+        'O evento precisa ter duração mínima de 30 minutos.',
         StatusCodes.BAD_REQUEST
       )
     }
@@ -105,7 +124,8 @@ class CreateEventService {
         endTime,
         description,
         isRestricted,
-        duration
+        duration,
+        banner
       }
     })
 

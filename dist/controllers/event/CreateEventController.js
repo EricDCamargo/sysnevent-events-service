@@ -19,10 +19,19 @@ const AppError_1 = require("../../errors/AppError");
 const CreateEventService_1 = require("../../services/event/CreateEventService");
 const prisma_1 = __importDefault(require("../../prisma"));
 const types_1 = require("../../@types/types");
+const cloudinaryUpload_1 = require("../../lib/cloudinaryUpload");
 class CreateEventController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration } = req.body;
+            if (!req.files || Object.keys(req.files).length === 0) {
+                throw new AppError_1.AppError('Nenhum arquivo de imagem foi enviado.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+            }
+            const file = req.files['file'];
+            if (!file.mimetype.startsWith('image/')) {
+                throw new AppError_1.AppError('Formato de arquivo inválido. Apenas imagens são permitidas.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+            }
+            const resultFile = yield (0, cloudinaryUpload_1.uploadToCloudinary)(file);
             const category = yield prisma_1.default.category.findUnique({
                 where: { id: categoryId }
             });
@@ -96,9 +105,11 @@ class CreateEventController {
                 });
             }
             // Garantir que startTime e endTime estejam no mesmo dia que startDate
-            const dateString = parsedStartDate.toDateString();
-            if (parsedStartTime.toDateString() !== dateString ||
-                parsedEndTime.toDateString() !== dateString) {
+            const sameDay = (a, b) => a.getUTCFullYear() === b.getUTCFullYear() &&
+                a.getUTCMonth() === b.getUTCMonth() &&
+                a.getUTCDate() === b.getUTCDate();
+            if (!sameDay(parsedStartTime, parsedStartDate) ||
+                !sameDay(parsedEndTime, parsedStartDate)) {
                 return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                     error: 'startTime e endTime precisam estar no mesmo dia do startDate'
                 });
@@ -115,6 +126,11 @@ class CreateEventController {
                 finalLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.enforcedLocation;
                 finalCustomLocation = types_1.FIXED_CATEGORIES.CURSO_ONLINE.customLocation;
             }
+            const parsedMaxParticipants = Number(maxParticipants);
+            const parsedDuration = duration !== undefined ? Number(duration) : undefined;
+            const parsedIsRestricted = isRestricted !== undefined
+                ? isRestricted === 'true' || isRestricted === true
+                : undefined;
             // Chamada ao Service
             const createEventService = new CreateEventService_1.CreateEventService();
             try {
@@ -123,7 +139,7 @@ class CreateEventController {
                     categoryId,
                     course,
                     semester,
-                    maxParticipants,
+                    maxParticipants: parsedMaxParticipants,
                     location: finalLocation,
                     customLocation: finalCustomLocation,
                     speakerName,
@@ -131,8 +147,9 @@ class CreateEventController {
                     startTime: parsedStartTime,
                     endTime: parsedEndTime,
                     description,
-                    isRestricted,
-                    duration
+                    isRestricted: parsedIsRestricted,
+                    duration: parsedDuration,
+                    banner: resultFile.url
                 });
                 return res.status(http_status_codes_1.StatusCodes.CREATED).json(result);
             }

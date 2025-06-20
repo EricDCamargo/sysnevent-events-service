@@ -20,6 +20,7 @@ interface UpdateEventRequest {
   description?: string
   isRestricted?: boolean
   duration?: number
+  banner?: string
 }
 
 class UpdateEventService {
@@ -38,7 +39,8 @@ class UpdateEventService {
     endTime,
     description,
     isRestricted,
-    duration
+    duration,
+    banner
   }: UpdateEventRequest): Promise<AppResponse> {
     const event = await prismaClient.event.findUnique({
       where: { id: event_id }
@@ -100,7 +102,9 @@ class UpdateEventService {
         endTime: newEndTime,
         description: description ?? event.description,
         isRestricted: isRestricted ?? event.isRestricted,
-        duration: duration ?? event.duration
+        duration: duration ?? event.duration,
+        banner: banner ?? event.banner,
+        updated_at: new Date()
       },
       select: {
         id: true,
@@ -119,6 +123,7 @@ class UpdateEventService {
         description: true,
         isRestricted: true,
         duration: true,
+        banner: true,
         created_at: true,
         updated_at: true
       }

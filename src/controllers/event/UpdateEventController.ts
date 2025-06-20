@@ -5,6 +5,8 @@ import { UpdateEventService } from '../../services/event/UpdateEventService'
 import prismaClient from '../../prisma'
 import { FIXED_CATEGORIES } from '../../@types/types'
 import { Course, Semester, Location } from '@prisma/client'
+import { UploadedFile } from 'express-fileupload'
+import { uploadToCloudinary } from '../../lib/cloudinaryUpload'
 
 class UpdateEventController {
   async handle(req: Request, res: Response) {
@@ -72,9 +74,7 @@ class UpdateEventController {
     })
 
     const isCursoOnline =
-      category &&
-      fixedCursoOnline &&
-      category.id === fixedCursoOnline.id
+      category && fixedCursoOnline && category.id === fixedCursoOnline.id
 
     let finalLocation = location
     let finalCustomLocation = customLocation
@@ -163,6 +163,19 @@ class UpdateEventController {
       }
     }
 
+    let bannerUrl: string | undefined = undefined
+
+    if (req.files && req.files['file']) {
+      const file: UploadedFile = req.files['file'] as UploadedFile
+      if (!file.mimetype.startsWith('image/')) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          error: 'Formato de arquivo inválido. Apenas imagens são permitidas.'
+        })
+      }
+      const resultFile = await uploadToCloudinary(file)
+      bannerUrl = resultFile.url
+    }
+
     const updateEventService = new UpdateEventService()
 
     try {
@@ -181,7 +194,8 @@ class UpdateEventController {
         endTime,
         description,
         isRestricted,
-        duration
+        duration,
+        banner: bannerUrl
       })
 
       return res.status(StatusCodes.OK).json(result)

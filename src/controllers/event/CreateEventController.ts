@@ -5,6 +5,8 @@ import { AppError } from '../../errors/AppError'
 import { CreateEventService } from '../../services/event/CreateEventService'
 import prismaClient from '../../prisma'
 import { FIXED_CATEGORIES } from '../../@types/types'
+import { UploadedFile } from 'express-fileupload'
+import { uploadToCloudinary } from '../../lib/cloudinaryUpload'
 
 class CreateEventController {
   async handle(req: Request, res: Response) {
@@ -24,6 +26,23 @@ class CreateEventController {
       isRestricted,
       duration
     } = req.body
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+      throw new AppError(
+        'Nenhum arquivo de imagem foi enviado.',
+        StatusCodes.BAD_REQUEST
+      )
+    }
+    const file: UploadedFile = req.files['file'] as UploadedFile
+
+    if (!file.mimetype.startsWith('image/')) {
+      throw new AppError(
+        'Formato de arquivo inválido. Apenas imagens são permitidas.',
+        StatusCodes.BAD_REQUEST
+      )
+    }
+
+    const resultFile = await uploadToCloudinary(file)
 
     const category = await prismaClient.category.findUnique({
       where: { id: categoryId }
@@ -107,10 +126,14 @@ class CreateEventController {
     }
 
     // Garantir que startTime e endTime estejam no mesmo dia que startDate
-    const dateString = parsedStartDate.toDateString()
+    const sameDay = (a: Date, b: Date) =>
+      a.getUTCFullYear() === b.getUTCFullYear() &&
+      a.getUTCMonth() === b.getUTCMonth() &&
+      a.getUTCDate() === b.getUTCDate()
+
     if (
-      parsedStartTime.toDateString() !== dateString ||
-      parsedEndTime.toDateString() !== dateString
+      !sameDay(parsedStartTime, parsedStartDate) ||
+      !sameDay(parsedEndTime, parsedStartDate)
     ) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         error: 'startTime e endTime precisam estar no mesmo dia do startDate'
@@ -133,6 +156,13 @@ class CreateEventController {
       finalCustomLocation = FIXED_CATEGORIES.CURSO_ONLINE.customLocation
     }
 
+    const parsedMaxParticipants = Number(maxParticipants)
+    const parsedDuration = duration !== undefined ? Number(duration) : undefined
+    const parsedIsRestricted =
+      isRestricted !== undefined
+        ? isRestricted === 'true' || isRestricted === true
+        : undefined
+
     // Chamada ao Service
     const createEventService = new CreateEventService()
 
@@ -142,7 +172,7 @@ class CreateEventController {
         categoryId,
         course,
         semester,
-        maxParticipants,
+        maxParticipants: parsedMaxParticipants,
         location: finalLocation,
         customLocation: finalCustomLocation,
         speakerName,
@@ -150,8 +180,9 @@ class CreateEventController {
         startTime: parsedStartTime,
         endTime: parsedEndTime,
         description,
-        isRestricted,
-        duration
+        isRestricted: parsedIsRestricted,
+        duration: parsedDuration,
+        banner: resultFile.url
       })
 
       return res.status(StatusCodes.CREATED).json(result)

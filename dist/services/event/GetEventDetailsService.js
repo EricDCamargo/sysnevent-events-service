@@ -39,6 +39,7 @@ class GetEventDetailsService {
                     duration: true,
                     description: true,
                     isRestricted: true,
+                    banner: true,
                     created_at: true,
                     updated_at: true
                 }

@@ -19,6 +19,7 @@ const UpdateEventService_1 = require("../../services/event/UpdateEventService");
 const prisma_1 = __importDefault(require("../../prisma"));
 const types_1 = require("../../@types/types");
 const client_1 = require("@prisma/client");
+const cloudinaryUpload_1 = require("../../lib/cloudinaryUpload");
 class UpdateEventController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -58,9 +59,7 @@ class UpdateEventController {
                     name: types_1.FIXED_CATEGORIES.CURSO_ONLINE.name
                 }
             });
-            const isCursoOnline = category &&
-                fixedCursoOnline &&
-                category.id === fixedCursoOnline.id;
+            const isCursoOnline = category && fixedCursoOnline && category.id === fixedCursoOnline.id;
             let finalLocation = location;
             let finalCustomLocation = customLocation;
             if (isCursoOnline) {
@@ -136,6 +135,17 @@ class UpdateEventController {
                     }
                 }
             }
+            let bannerUrl = undefined;
+            if (req.files && req.files['file']) {
+                const file = req.files['file'];
+                if (!file.mimetype.startsWith('image/')) {
+                    return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
+                        error: 'Formato de arquivo inválido. Apenas imagens são permitidas.'
+                    });
+                }
+                const resultFile = yield (0, cloudinaryUpload_1.uploadToCloudinary)(file);
+                bannerUrl = resultFile.url;
+            }
             const updateEventService = new UpdateEventService_1.UpdateEventService();
             try {
                 const result = yield updateEventService.execute({
@@ -153,7 +163,8 @@ class UpdateEventController {
                     endTime,
                     description,
                     isRestricted,
-                    duration
+                    duration,
+                    banner: bannerUrl
                 });
                 return res.status(http_status_codes_1.StatusCodes.OK).json(result);
             }

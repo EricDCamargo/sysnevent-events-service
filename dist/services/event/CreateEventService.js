@@ -18,16 +18,21 @@ const AppError_1 = require("../../errors/AppError");
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateEventService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration }) {
+        return __awaiter(this, arguments, void 0, function* ({ name, banner, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration }) {
             const categoryExists = yield prisma_1.default.category.findUnique({
                 where: { id: categoryId }
             });
             if (!categoryExists) {
                 throw new AppError_1.AppError('Categoria não encontrada.', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
+            const startDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes(), startTime.getSeconds());
             const now = new Date();
-            if (startDate < now) {
-                throw new AppError_1.AppError('A data de início do evento não pode estar no passado.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+            if (startDateTime < now) {
+                throw new AppError_1.AppError('A data e hora de início do evento não podem estar no passado.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+            }
+            const diffMs = endTime.getTime() - startTime.getTime();
+            if (diffMs < 30 * 60 * 1000) {
+                throw new AppError_1.AppError('O evento precisa ter duração mínima de 30 minutos.', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
             if (endTime <= startTime) {
                 throw new AppError_1.AppError('A hora de término deve ser posterior à hora de início.', http_status_codes_1.StatusCodes.BAD_REQUEST);
@@ -67,7 +72,8 @@ class CreateEventService {
                     endTime,
                     description,
                     isRestricted,
-                    duration
+                    duration,
+                    banner
                 }
             });
             return {
