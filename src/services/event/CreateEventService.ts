@@ -19,6 +19,7 @@ interface CreateEventRequest {
   endTime: Date
   isRestricted?: boolean
   duration?: number
+  isCursoOnline: boolean
 }
 
 class CreateEventService {
@@ -37,7 +38,8 @@ class CreateEventService {
     endTime,
     description,
     isRestricted,
-    duration
+    duration,
+    isCursoOnline
   }: CreateEventRequest): Promise<AppResponse> {
     const categoryExists = await prismaClient.category.findUnique({
       where: { id: categoryId }
@@ -87,26 +89,27 @@ class CreateEventService {
       )
     }
 
-    // Get all events for this location and date
-    const conflictingEvents = await prismaClient.event.findMany({
-      where: {
-        location,
-        startDate,
-        // Checks if the new event overlaps with any existing event
-        OR: [
-          {
-            startTime: { lt: endTime },
-            endTime: { gt: startTime }
-          }
-        ]
-      }
-    })
+    if (!isCursoOnline) {
+      const conflictingEvents = await prismaClient.event.findMany({
+        where: {
+          location,
+          startDate,
+          // Checks if the new event overlaps with any existing event
+          OR: [
+            {
+              startTime: { lt: endTime },
+              endTime: { gt: startTime }
+            }
+          ]
+        }
+      })
 
-    if (conflictingEvents.length > 0) {
-      throw new AppError(
-        'O horário selecionado conflita com outro evento já cadastrado.',
-        StatusCodes.CONFLICT
-      )
+      if (conflictingEvents.length > 0) {
+        throw new AppError(
+          'O horário selecionado conflita com outro evento já cadastrado.',
+          StatusCodes.CONFLICT
+        )
+      }
     }
 
     const event = await prismaClient.event.create({

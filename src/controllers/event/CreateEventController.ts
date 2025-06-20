@@ -182,7 +182,8 @@ class CreateEventController {
         description,
         isRestricted: parsedIsRestricted,
         duration: parsedDuration,
-        banner: resultFile.url
+        banner: resultFile.url,
+        isCursoOnline: !!isCursoOnline
       })
 
       return res.status(StatusCodes.CREATED).json(result)

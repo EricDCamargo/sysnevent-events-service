@@ -18,7 +18,7 @@ const AppError_1 = require("../../errors/AppError");
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateEventService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, banner, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration }) {
+        return __awaiter(this, arguments, void 0, function* ({ name, banner, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration, isCursoOnline }) {
             const categoryExists = yield prisma_1.default.category.findUnique({
                 where: { id: categoryId }
             });
@@ -40,22 +40,23 @@ class CreateEventService {
             if (maxParticipants <= 0) {
                 throw new AppError_1.AppError('O número máximo de participantes deve ser maior que zero.', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
-            // Get all events for this location and date
-            const conflictingEvents = yield prisma_1.default.event.findMany({
-                where: {
-                    location,
-                    startDate,
-                    // Checks if the new event overlaps with any existing event
-                    OR: [
-                        {
-                            startTime: { lt: endTime },
-                            endTime: { gt: startTime }
-                        }
-                    ]
+            if (!isCursoOnline) {
+                const conflictingEvents = yield prisma_1.default.event.findMany({
+                    where: {
+                        location,
+                        startDate,
+                        // Checks if the new event overlaps with any existing event
+                        OR: [
+                            {
+                                startTime: { lt: endTime },
+                                endTime: { gt: startTime }
+                            }
+                        ]
+                    }
+                });
+                if (conflictingEvents.length > 0) {
+                    throw new AppError_1.AppError('O horário selecionado conflita com outro evento já cadastrado.', http_status_codes_1.StatusCodes.CONFLICT);
                 }
-            });
-            if (conflictingEvents.length > 0) {
-                throw new AppError_1.AppError('O horário selecionado conflita com outro evento já cadastrado.', http_status_codes_1.StatusCodes.CONFLICT);
             }
             const event = yield prisma_1.default.event.create({
                 data: {
