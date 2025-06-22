@@ -20,11 +20,17 @@ const prisma_1 = __importDefault(require("../../prisma"));
 const types_1 = require("../../@types/types");
 const client_1 = require("@prisma/client");
 const cloudinaryUpload_1 = require("../../lib/cloudinaryUpload");
+function isSameUTCDate(a, b) {
+    return (a.getUTCFullYear() === b.getUTCFullYear() &&
+        a.getUTCMonth() === b.getUTCMonth() &&
+        a.getUTCDate() === b.getUTCDate());
+}
 class UpdateEventController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const event_id = req.query.event_id;
             const { name, categoryId, course, semester, maxParticipants, location, customLocation, speakerName, startDate, startTime, endTime, description, isRestricted, duration } = req.body;
+            console.log('Data de inicio ' + startDate, 'Horario de inicio ' + startTime, 'Horario de termino ' + endTime);
             if (!event_id) {
                 throw new AppError_1.AppError('É necessário informar o ID do evento', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
@@ -115,7 +121,7 @@ class UpdateEventController {
                             error: 'startTime inválido. Precisa ser um DateTime válido.'
                         });
                     }
-                    if (parsedStartTime.toDateString() !== currentStartDate.toDateString()) {
+                    if (!isSameUTCDate(parsedStartTime, currentStartDate)) {
                         return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                             error: 'startTime precisa ser no mesmo dia do startDate.'
                         });
@@ -128,7 +134,7 @@ class UpdateEventController {
                             error: 'endTime inválido. Precisa ser um DateTime válido.'
                         });
                     }
-                    if (parsedEndTime.toDateString() !== currentStartDate.toDateString()) {
+                    if (!isSameUTCDate(parsedEndTime, currentStartDate)) {
                         return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
                             error: 'endTime precisa ser no mesmo dia do startDate.'
                         });
@@ -146,6 +152,11 @@ class UpdateEventController {
                 const resultFile = yield (0, cloudinaryUpload_1.uploadToCloudinary)(file);
                 bannerUrl = resultFile.url;
             }
+            const parsedMaxParticipants = Number(maxParticipants);
+            const parsedDuration = duration !== undefined ? Number(duration) : undefined;
+            const parsedIsRestricted = isRestricted !== undefined
+                ? isRestricted === 'true' || isRestricted === true
+                : undefined;
             const updateEventService = new UpdateEventService_1.UpdateEventService();
             try {
                 const result = yield updateEventService.execute({
@@ -154,7 +165,7 @@ class UpdateEventController {
                     categoryId,
                     course,
                     semester,
-                    maxParticipants,
+                    maxParticipants: parsedMaxParticipants,
                     location: finalLocation,
                     customLocation: finalCustomLocation,
                     speakerName,
@@ -162,13 +173,14 @@ class UpdateEventController {
                     startTime,
                     endTime,
                     description,
-                    isRestricted,
-                    duration,
+                    isRestricted: parsedIsRestricted,
+                    duration: parsedDuration,
                     banner: bannerUrl
                 });
                 return res.status(http_status_codes_1.StatusCodes.OK).json(result);
             }
             catch (error) {
+                console.log(error);
                 if (error instanceof AppError_1.AppError) {
                     return res.status(error.statusCode).json({ error: error.message });
                 }

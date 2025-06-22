@@ -8,6 +8,14 @@ import { Course, Semester, Location } from '@prisma/client'
 import { UploadedFile } from 'express-fileupload'
 import { uploadToCloudinary } from '../../lib/cloudinaryUpload'
 
+function isSameUTCDate(a: Date, b: Date) {
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  )
+}
+
 class UpdateEventController {
   async handle(req: Request, res: Response) {
     const event_id = req.query.event_id as string
@@ -27,6 +35,12 @@ class UpdateEventController {
       isRestricted,
       duration
     } = req.body
+
+    console.log(
+      'Data de inicio ' + startDate,
+      'Horario de inicio ' + startTime,
+      'Horario de termino ' + endTime
+    )
 
     if (!event_id) {
       throw new AppError(
@@ -138,9 +152,7 @@ class UpdateEventController {
           })
         }
 
-        if (
-          parsedStartTime.toDateString() !== currentStartDate.toDateString()
-        ) {
+        if (!isSameUTCDate(parsedStartTime, currentStartDate)) {
           return res.status(StatusCodes.BAD_REQUEST).json({
             error: 'startTime precisa ser no mesmo dia do startDate.'
           })
@@ -155,7 +167,7 @@ class UpdateEventController {
           })
         }
 
-        if (parsedEndTime.toDateString() !== currentStartDate.toDateString()) {
+        if (!isSameUTCDate(parsedEndTime, currentStartDate)) {
           return res.status(StatusCodes.BAD_REQUEST).json({
             error: 'endTime precisa ser no mesmo dia do startDate.'
           })
@@ -175,6 +187,12 @@ class UpdateEventController {
       const resultFile = await uploadToCloudinary(file)
       bannerUrl = resultFile.url
     }
+    const parsedMaxParticipants = Number(maxParticipants)
+    const parsedDuration = duration !== undefined ? Number(duration) : undefined
+    const parsedIsRestricted =
+      isRestricted !== undefined
+        ? isRestricted === 'true' || isRestricted === true
+        : undefined
 
     const updateEventService = new UpdateEventService()
 
@@ -185,7 +203,7 @@ class UpdateEventController {
         categoryId,
         course,
         semester,
-        maxParticipants,
+        maxParticipants: parsedMaxParticipants,
         location: finalLocation,
         customLocation: finalCustomLocation,
         speakerName,
@@ -193,13 +211,14 @@ class UpdateEventController {
         startTime,
         endTime,
         description,
-        isRestricted,
-        duration,
+        isRestricted: parsedIsRestricted,
+        duration: parsedDuration,
         banner: bannerUrl
       })
 
       return res.status(StatusCodes.OK).json(result)
     } catch (error) {
+      console.log(error)
       if (error instanceof AppError) {
         return res.status(error.statusCode).json({ error: error.message })
       }
