@@ -11,12 +11,17 @@ function toTimeString(date: Date) {
 }
 
 class CheckAvailableTimeSlotsService {
-  async execute(location: Location, date: string): Promise<AppResponse> {
+  async execute(
+    location: Location,
+    date: string,
+    ignoreEventId?: string
+  ): Promise<AppResponse> {
     // Search all events for the given location and date
     const events = await prisma.event.findMany({
       where: {
         location,
-        startDate: new Date(date)
+        startDate: new Date(date),
+        ...(ignoreEventId && { id: { not: ignoreEventId } })
       },
       select: {
         startTime: true,

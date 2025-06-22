@@ -21,14 +21,11 @@ function toTimeString(date) {
     return date.toTimeString().slice(0, 5);
 }
 class CheckAvailableTimeSlotsService {
-    execute(location, date) {
+    execute(location, date, ignoreEventId) {
         return __awaiter(this, void 0, void 0, function* () {
             // Search all events for the given location and date
             const events = yield prisma_1.default.event.findMany({
-                where: {
-                    location,
-                    startDate: new Date(date)
-                },
+                where: Object.assign({ location, startDate: new Date(date) }, (ignoreEventId && { id: { not: ignoreEventId } })),
                 select: {
                     startTime: true,
                     endTime: true

@@ -18,13 +18,13 @@ const MIN_SLOT_MINUTES = Number(process.env.MIN_SLOT_MINUTES) || 20;
 const DAY_START_HOUR = process.env.DAY_START_HOUR || '00:00';
 const DAY_END_HOUR = process.env.DAY_END_HOUR || '23:59';
 class CheckUnavailableDatesService {
-    execute(location) {
+    execute(location, ignoreEventId) {
         return __awaiter(this, void 0, void 0, function* () {
             // Search all events for the given location and date
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const events = yield prisma_1.default.event.findMany({
-                where: { location, startDate: { gte: today } },
+                where: Object.assign({ location, startDate: { gte: today } }, (ignoreEventId && { id: { not: ignoreEventId } })),
                 select: {
                     startDate: true,
                     startTime: true,

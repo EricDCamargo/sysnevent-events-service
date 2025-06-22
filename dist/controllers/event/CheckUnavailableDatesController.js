@@ -16,7 +16,7 @@ const client_1 = require("@prisma/client");
 class CheckUnavailableDatesController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { location } = req.query;
+            const { location, ignoreEventId } = req.query;
             if (!location || typeof location !== 'string') {
                 return res
                     .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
@@ -29,7 +29,7 @@ class CheckUnavailableDatesController {
                     .json({ error: 'Localização inválida' });
             }
             const service = new CheckUnavailableDatesService_1.CheckUnavailableDatesService();
-            const result = yield service.execute(client_1.Location[upperLocation]);
+            const result = yield service.execute(client_1.Location[upperLocation], ignoreEventId);
             return res.json(result);
         });
     }

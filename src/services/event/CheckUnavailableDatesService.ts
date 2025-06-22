@@ -7,14 +7,21 @@ const DAY_START_HOUR = process.env.DAY_START_HOUR || '00:00'
 const DAY_END_HOUR = process.env.DAY_END_HOUR || '23:59'
 
 class CheckUnavailableDatesService {
-  async execute(location: Location): Promise<AppResponse> {
+  async execute(
+    location: Location,
+    ignoreEventId?: string
+  ): Promise<AppResponse> {
     // Search all events for the given location and date
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
     const events = await prisma.event.findMany({
-      where: { location, startDate: { gte: today } },
+      where: {
+        location,
+        startDate: { gte: today },
+        ...(ignoreEventId && { id: { not: ignoreEventId } })
+      },
       select: {
         startDate: true,
         startTime: true,

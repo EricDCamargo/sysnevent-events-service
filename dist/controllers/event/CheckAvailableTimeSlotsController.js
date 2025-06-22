@@ -16,7 +16,7 @@ const client_1 = require("@prisma/client");
 class CheckAvailableTimeSlotsController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { location, date } = req.query;
+            const { location, date, ignoreEventId } = req.query;
             if (!location ||
                 typeof location !== 'string' ||
                 !date ||
@@ -32,7 +32,7 @@ class CheckAvailableTimeSlotsController {
                     .json({ error: 'Invalid location' });
             }
             const service = new CheckAvailableTimeSlotsService_1.CheckAvailableTimeSlotsService();
-            const result = yield service.execute(client_1.Location[upperLocation], date);
+            const result = yield service.execute(client_1.Location[upperLocation], date, ignoreEventId);
             return res.json(result);
         });
     }

@@ -5,7 +5,7 @@ import { Location } from '@prisma/client'
 
 class CheckAvailableTimeSlotsController {
   async handle(req: Request, res: Response) {
-    const { location, date } = req.query
+    const { location, date, ignoreEventId } = req.query
 
     if (
       !location ||
@@ -26,7 +26,7 @@ class CheckAvailableTimeSlotsController {
     }
 
     const service = new CheckAvailableTimeSlotsService()
-    const result = await service.execute(Location[upperLocation], date)
+    const result = await service.execute(Location[upperLocation], date, ignoreEventId as string)
 
     return res.json(result)
   }

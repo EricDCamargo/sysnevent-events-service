@@ -5,7 +5,7 @@ import { Location } from '@prisma/client'
 
 class CheckUnavailableDatesController {
   async handle(req: Request, res: Response) {
-    const { location } = req.query
+    const { location, ignoreEventId } = req.query
 
     if (!location || typeof location !== 'string') {
       return res
@@ -21,7 +21,10 @@ class CheckUnavailableDatesController {
     }
 
     const service = new CheckUnavailableDatesService()
-    const result = await service.execute(Location[upperLocation])
+    const result = await service.execute(
+      Location[upperLocation],
+      ignoreEventId as string
+    )
 
     return res.json(result)
   }
