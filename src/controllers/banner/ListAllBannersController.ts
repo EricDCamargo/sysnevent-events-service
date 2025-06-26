@@ -17,7 +17,7 @@ export class ListAllBannersController {
 
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Erro interno ao listar banners.' })
+        .json({ error: 'Erro interno ao listar baners.' })
     }
   }
 }

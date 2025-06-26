@@ -27,7 +27,7 @@ class ListAllBannersController {
                 }
                 return res
                     .status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR)
-                    .json({ error: 'Erro interno ao listar banners.' });
+                    .json({ error: 'Erro interno ao listar baners.' });
             }
         });
     }

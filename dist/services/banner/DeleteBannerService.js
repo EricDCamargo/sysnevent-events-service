@@ -21,7 +21,7 @@ class DeleteBannerService {
         return __awaiter(this, void 0, void 0, function* () {
             const banner = yield prisma_1.default.banner.findUnique({ where: { id } });
             if (!banner) {
-                throw new AppError_1.AppError('Banner não encontrado.', http_status_codes_1.StatusCodes.NOT_FOUND);
+                throw new AppError_1.AppError('Baner não encontrado.', http_status_codes_1.StatusCodes.NOT_FOUND);
             }
             // Deleta o banner
             yield prisma_1.default.banner.delete({ where: { id } });
@@ -38,7 +38,7 @@ class DeleteBannerService {
                     }
                 }
             });
-            return { message: 'Banner deletado com sucesso.' };
+            return { message: 'Baner deletado com sucesso.' };
         });
     }
 }

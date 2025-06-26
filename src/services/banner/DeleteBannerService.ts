@@ -1,13 +1,14 @@
 import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
 import prismaClient from '../../prisma'
+import { AppResponse } from '../../@types/app.types'
 
 export class DeleteBannerService {
-  async execute(id: string): Promise<{ message: string }> {
+  async execute(id: string): Promise<AppResponse> {
     const banner = await prismaClient.banner.findUnique({ where: { id } })
 
     if (!banner) {
-      throw new AppError('Banner não encontrado.', StatusCodes.NOT_FOUND)
+      throw new AppError('Baner não encontrado.', StatusCodes.NOT_FOUND)
     }
 
     // Deleta o banner
@@ -27,6 +28,6 @@ export class DeleteBannerService {
       }
     })
 
-    return { message: 'Banner deletado com sucesso.' }
+    return { message: 'Baner deletado com sucesso.' }
   }
 }

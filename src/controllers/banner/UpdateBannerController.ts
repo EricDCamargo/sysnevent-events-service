@@ -13,7 +13,7 @@ export class UpdateBannerController {
 
       if (!id) {
         throw new AppError(
-          'ID do banner é obrigatório.',
+          'ID do baner é obrigatório.',
           StatusCodes.BAD_REQUEST
         )
       }
@@ -54,7 +54,7 @@ export class UpdateBannerController {
 
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Erro interno ao atualizar banner.' })
+        .json({ error: 'Erro interno ao atualizar baner.' })
     }
   }
 }

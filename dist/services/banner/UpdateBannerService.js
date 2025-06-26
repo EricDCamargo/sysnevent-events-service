@@ -21,7 +21,7 @@ class UpdateBannerService {
         return __awaiter(this, arguments, void 0, function* ({ id, name, imageUrl, order, isActive }) {
             const banner = yield prisma_1.default.banner.findUnique({ where: { id } });
             if (!banner) {
-                throw new AppError_1.AppError('Banner não encontrado.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                throw new AppError_1.AppError('Baner não encontrado.', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
             const updates = {};
             if (name)
@@ -32,7 +32,7 @@ class UpdateBannerService {
                 updates.isActive = isActive;
             if (order !== undefined && order !== null && order !== banner.order) {
                 if (order < 1) {
-                    throw new AppError_1.AppError('A ordem do banner deve ser maior ou igual a 1.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                    throw new AppError_1.AppError('A ordem do baner deve ser maior ou igual a 1.', http_status_codes_1.StatusCodes.BAD_REQUEST);
                 }
                 const totalBanners = yield prisma_1.default.banner.count();
                 if (order > totalBanners) {
@@ -85,7 +85,7 @@ class UpdateBannerService {
             });
             return {
                 data: updated,
-                message: 'Banner atualizado com sucesso.'
+                message: 'Baner atualizado com sucesso.'
             };
         });
     }

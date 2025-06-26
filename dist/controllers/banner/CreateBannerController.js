@@ -20,10 +20,10 @@ class CreateBannerController {
             try {
                 const { name, order } = req.body;
                 if (!name) {
-                    throw new AppError_1.AppError('Nome do banner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                    throw new AppError_1.AppError('Nome do baner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
                 }
                 if (!req.files || !req.files['file']) {
-                    throw new AppError_1.AppError('Imagem do banner é obrigatória.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                    throw new AppError_1.AppError('Imagem do baner é obrigatória.', http_status_codes_1.StatusCodes.BAD_REQUEST);
                 }
                 const file = req.files['file'];
                 if (!file.mimetype.startsWith('image/')) {
@@ -44,7 +44,7 @@ class CreateBannerController {
                 }
                 return res
                     .status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR)
-                    .json({ error: 'Erro interno ao criar banner.' });
+                    .json({ error: 'Erro interno ao criar baner.' });
             }
         });
     }

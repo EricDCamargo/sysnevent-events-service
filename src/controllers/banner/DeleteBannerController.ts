@@ -10,7 +10,7 @@ export class DeleteBannerController {
 
       if (!id) {
         throw new AppError(
-          'ID do banner é obrigatório.',
+          'ID do baner é obrigatório.',
           StatusCodes.BAD_REQUEST
         )
       }
@@ -26,7 +26,7 @@ export class DeleteBannerController {
 
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Erro interno ao deletar banner.' })
+        .json({ error: 'Erro interno ao deletar baner.' })
     }
   }
 }

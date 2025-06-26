@@ -25,7 +25,7 @@ class CreateBannerService {
                 finalOrder = 1;
             }
             else if (order < 1) {
-                throw new AppError_1.AppError('A ordem do banner deve ser maior ou igual a 1.');
+                throw new AppError_1.AppError('A ordem do baner deve ser maior ou igual a 1.');
             }
             else {
                 finalOrder = order;
@@ -50,7 +50,7 @@ class CreateBannerService {
                     order: finalOrder
                 }
             });
-            return banner;
+            return { data: banner, message: 'Baner criado com sucesso.' };
         });
     }
 }

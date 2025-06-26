@@ -21,7 +21,7 @@ class UpdateBannerController {
                 const id = req.query.id;
                 const { name, order, isActive } = req.body;
                 if (!id) {
-                    throw new AppError_1.AppError('ID do banner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                    throw new AppError_1.AppError('ID do baner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
                 }
                 let imageUrl;
                 if (req.files && req.files['file']) {
@@ -50,7 +50,7 @@ class UpdateBannerController {
                 }
                 return res
                     .status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR)
-                    .json({ error: 'Erro interno ao atualizar banner.' });
+                    .json({ error: 'Erro interno ao atualizar baner.' });
             }
         });
     }

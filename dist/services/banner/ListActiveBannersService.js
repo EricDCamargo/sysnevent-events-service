@@ -27,7 +27,7 @@ class ListActiveBannersService {
             });
             return {
                 data: banners,
-                message: 'Banners ativos listados com sucesso.'
+                message: 'Baner ativos listados com sucesso.'
             };
         });
     }

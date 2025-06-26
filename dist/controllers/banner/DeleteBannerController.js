@@ -19,7 +19,7 @@ class DeleteBannerController {
             try {
                 const id = req.query.id;
                 if (!id) {
-                    throw new AppError_1.AppError('ID do banner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+                    throw new AppError_1.AppError('ID do baner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
                 }
                 const service = new DeleteBannerService_1.DeleteBannerService();
                 const result = yield service.execute(id);
@@ -31,7 +31,7 @@ class DeleteBannerController {
                 }
                 return res
                     .status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR)
-                    .json({ error: 'Erro interno ao deletar banner.' });
+                    .json({ error: 'Erro interno ao deletar baner.' });
             }
         });
     }

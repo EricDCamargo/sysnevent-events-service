@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { AppError } from '../../errors/AppError'
 import prismaClient from '../../prisma'
 import { Banner } from '@prisma/client'
+import { AppResponse } from '../../@types/app.types'
 
 interface UpdateBannerRequest {
   id: string
@@ -18,11 +19,11 @@ export class UpdateBannerService {
     imageUrl,
     order,
     isActive
-  }: UpdateBannerRequest): Promise<{ data: Banner; message: string }> {
+  }: UpdateBannerRequest): Promise<AppResponse> {
     const banner = await prismaClient.banner.findUnique({ where: { id } })
 
     if (!banner) {
-      throw new AppError('Banner não encontrado.', StatusCodes.BAD_REQUEST)
+      throw new AppError('Baner não encontrado.', StatusCodes.BAD_REQUEST)
     }
 
     const updates: Partial<Banner> = {}
@@ -34,7 +35,7 @@ export class UpdateBannerService {
     if (order !== undefined && order !== null && order !== banner.order) {
       if (order < 1) {
         throw new AppError(
-          'A ordem do banner deve ser maior ou igual a 1.',
+          'A ordem do baner deve ser maior ou igual a 1.',
           StatusCodes.BAD_REQUEST
         )
       }
@@ -97,7 +98,7 @@ export class UpdateBannerService {
 
     return {
       data: updated,
-      message: 'Banner atualizado com sucesso.'
+      message: 'Baner atualizado com sucesso.'
     }
   }
 }

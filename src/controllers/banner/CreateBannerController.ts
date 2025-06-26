@@ -12,14 +12,14 @@ export class CreateBannerController {
 
       if (!name) {
         throw new AppError(
-          'Nome do banner é obrigatório.',
+          'Nome do baner é obrigatório.',
           StatusCodes.BAD_REQUEST
         )
       }
 
       if (!req.files || !req.files['file']) {
         throw new AppError(
-          'Imagem do banner é obrigatória.',
+          'Imagem do baner é obrigatória.',
           StatusCodes.BAD_REQUEST
         )
       }
@@ -50,7 +50,7 @@ export class CreateBannerController {
 
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Erro interno ao criar banner.' })
+        .json({ error: 'Erro interno ao criar baner.' })
     }
   }
 }

@@ -26,7 +26,7 @@ class ListAllBannersService {
                     banners,
                     orderOptions
                 },
-                message: 'Banners listados com sucesso.'
+                message: 'Baner listados com sucesso.'
             };
         });
     }
