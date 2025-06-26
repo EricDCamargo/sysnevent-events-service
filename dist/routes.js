@@ -31,11 +31,11 @@ router.get('/unavailable-dates', isAuthenticated_1.isAuthenticated, isAuthentica
 router.get('/available-time-slots', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CheckAvailableTimeSlotsController_1.CheckAvailableTimeSlotsController().handle);
 router.patch('/update-participant-count', new UpdateParticipantCountController_1.UpdateParticipantCountController().handle);
 router.get('/categories', new ListCategoriesController_1.ListCategoriesController().handle);
-router.post('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new CreateCategoryController_1.CreateCategoryController().handle);
-router.put('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new UpdateCategoryController_1.UpdateCategoryController().handle);
-router.delete('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new DeleteCategoryController_1.DeleteCategoryController().handle);
-router.post('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new CreateBannerController_1.CreateBannerController().handle);
-router.get('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new ListAllBannersController_1.ListAllBannersController().handle);
+router.post('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateCategoryController_1.CreateCategoryController().handle);
+router.put('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new UpdateCategoryController_1.UpdateCategoryController().handle);
+router.delete('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new DeleteCategoryController_1.DeleteCategoryController().handle);
+router.post('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateBannerController_1.CreateBannerController().handle);
+router.get('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new ListAllBannersController_1.ListAllBannersController().handle);
 router.get('/banners/active', new ListActiveBannersController_1.ListActiveBannersController().handle);
-router.put('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new UpdateBannerController_1.UpdateBannerController().handle);
-router.delete('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new DeleteBannerController_1.DeleteBannerController().handle);
+router.put('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new UpdateBannerController_1.UpdateBannerController().handle);
+router.delete('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new DeleteBannerController_1.DeleteBannerController().handle);

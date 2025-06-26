@@ -30,14 +30,14 @@ router.get('/available-time-slots', isAuthenticated, isCoordinator, new CheckAva
 router.patch('/update-participant-count', new UpdateParticipantCountController().handle)
 
 router.get('/categories', new ListCategoriesController().handle)
-router.post('/categories', isAuthenticated, isAdmin, new CreateCategoryController().handle)
-router.put('/categories', isAuthenticated, isAdmin, new UpdateCategoryController().handle)
-router.delete('/categories', isAuthenticated, isAdmin, new DeleteCategoryController().handle)
+router.post('/categories', isAuthenticated, isCoordinator, new CreateCategoryController().handle)
+router.put('/categories', isAuthenticated, isCoordinator, new UpdateCategoryController().handle)
+router.delete('/categories', isAuthenticated, isCoordinator, new DeleteCategoryController().handle)
 
-router.post('/banners', isAuthenticated, isAdmin, new CreateBannerController().handle)
-router.get('/banners', isAuthenticated, isAdmin, new ListAllBannersController().handle)
+router.post('/banners', isAuthenticated, isCoordinator, new CreateBannerController().handle)
+router.get('/banners', isAuthenticated, isCoordinator, new ListAllBannersController().handle)
 router.get('/banners/active', new ListActiveBannersController().handle)
-router.put('/banners', isAuthenticated, isAdmin, new UpdateBannerController().handle)
-router.delete('/banners', isAuthenticated, isAdmin, new DeleteBannerController().handle)
+router.put('/banners', isAuthenticated, isCoordinator, new UpdateBannerController().handle)
+router.delete('/banners', isAuthenticated, isCoordinator, new DeleteBannerController().handle)
 
 export { router }
