@@ -4,7 +4,7 @@ import { ListActiveBannersService } from '../../services/banner/ListActiveBanner
 import { AppError } from '../../errors/AppError'
 
 export class ListActiveBannersController {
-  async handle(_req: Request, res: Response) {
+  async handle(req: Request, res: Response) {
     const service = new ListActiveBannersService()
 
     try {

@@ -4,7 +4,7 @@ import { ListAllBannersService } from '../../services/banner/ListAllBannersServi
 import { AppError } from '../../errors/AppError'
 
 export class ListAllBannersController {
-  async handle(_req: Request, res: Response) {
+  async handle(req: Request, res: Response) {
     const service = new ListAllBannersService()
 
     try {

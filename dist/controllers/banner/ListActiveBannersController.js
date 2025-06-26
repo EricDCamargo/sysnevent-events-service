@@ -14,7 +14,7 @@ const http_status_codes_1 = require("http-status-codes");
 const ListActiveBannersService_1 = require("../../services/banner/ListActiveBannersService");
 const AppError_1 = require("../../errors/AppError");
 class ListActiveBannersController {
-    handle(_req, res) {
+    handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const service = new ListActiveBannersService_1.ListActiveBannersService();
             try {
