@@ -8,7 +8,8 @@ import { UpdateBannerService } from '../../services/banner/UpdateBannerService'
 export class UpdateBannerController {
   async handle(req: Request, res: Response) {
     try {
-      const { id, name, order, isActive } = req.body
+      const id = req.query.id as string
+      const { name, order, isActive } = req.body
 
       if (!id) {
         throw new AppError(

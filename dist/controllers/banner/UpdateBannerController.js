@@ -18,7 +18,8 @@ class UpdateBannerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, name, order, isActive } = req.body;
+                const id = req.query.id;
+                const { name, order, isActive } = req.body;
                 if (!id) {
                     throw new AppError_1.AppError('ID do banner é obrigatório.', http_status_codes_1.StatusCodes.BAD_REQUEST);
                 }

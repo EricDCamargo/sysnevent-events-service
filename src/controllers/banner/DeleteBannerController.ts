@@ -6,7 +6,7 @@ import { DeleteBannerService } from '../../services/banner/DeleteBannerService'
 export class DeleteBannerController {
   async handle(req: Request, res: Response) {
     try {
-      const { id } = req.body
+      const id = req.query.id as string
 
       if (!id) {
         throw new AppError(
