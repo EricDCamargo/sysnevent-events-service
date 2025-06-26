@@ -12,6 +12,11 @@ import { CreateCategoryController } from './controllers/category/CreateCategoryC
 import { DeleteCategoryController } from './controllers/category/DeleteCategoryController'
 import { ListCategoriesController } from './controllers/category/ListCategoriesController'
 import { UpdateCategoryController } from './controllers/category/UpdateCategoryController'
+import { CreateBannerController } from './controllers/banner/CreateBannerController'
+import { DeleteBannerController } from './controllers/banner/DeleteBannerController'
+import { ListActiveBannersController } from './controllers/banner/ListActiveBannersController'
+import { ListAllBannersController } from './controllers/banner/ListAllBannersController'
+import { UpdateBannerController } from './controllers/banner/UpdateBannerController'
 
 const router = Router()
 
@@ -28,5 +33,11 @@ router.get('/categories', new ListCategoriesController().handle)
 router.post('/categories', isAuthenticated, isAdmin, new CreateCategoryController().handle)
 router.put('/categories', isAuthenticated, isAdmin, new UpdateCategoryController().handle)
 router.delete('/categories', isAuthenticated, isAdmin, new DeleteCategoryController().handle)
+
+router.post('/banners', isAuthenticated, isAdmin, new CreateBannerController().handle)
+router.get('/banners', isAuthenticated, isAdmin, new ListAllBannersController().handle)
+router.get('/banners/active', new ListActiveBannersController().handle)
+router.put('/banners', isAuthenticated, isAdmin, new UpdateBannerController().handle)
+router.delete('/banners', isAuthenticated, isAdmin, new DeleteBannerController().handle)
 
 export { router }

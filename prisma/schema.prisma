@@ -67,6 +67,18 @@ model Category {
   @@map("categories")
 }
 
+model Banner {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  imageUrl  String   @db.VarChar(500)
+  isActive  Boolean  @default(true)
+  order     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("banners")
+}
+
 model Event {
   id          String    @id @default(uuid())
   name        String    @db.VarChar(100)

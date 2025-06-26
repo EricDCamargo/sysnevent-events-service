@@ -15,6 +15,11 @@ const CreateCategoryController_1 = require("./controllers/category/CreateCategor
 const DeleteCategoryController_1 = require("./controllers/category/DeleteCategoryController");
 const ListCategoriesController_1 = require("./controllers/category/ListCategoriesController");
 const UpdateCategoryController_1 = require("./controllers/category/UpdateCategoryController");
+const CreateBannerController_1 = require("./controllers/banner/CreateBannerController");
+const DeleteBannerController_1 = require("./controllers/banner/DeleteBannerController");
+const ListActiveBannersController_1 = require("./controllers/banner/ListActiveBannersController");
+const ListAllBannersController_1 = require("./controllers/banner/ListAllBannersController");
+const UpdateBannerController_1 = require("./controllers/banner/UpdateBannerController");
 const router = (0, express_1.Router)();
 exports.router = router;
 router.post('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateEventController_1.CreateEventController().handle);
@@ -29,3 +34,8 @@ router.get('/categories', new ListCategoriesController_1.ListCategoriesControlle
 router.post('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new CreateCategoryController_1.CreateCategoryController().handle);
 router.put('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new UpdateCategoryController_1.UpdateCategoryController().handle);
 router.delete('/categories', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new DeleteCategoryController_1.DeleteCategoryController().handle);
+router.post('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new CreateBannerController_1.CreateBannerController().handle);
+router.get('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new ListAllBannersController_1.ListAllBannersController().handle);
+router.get('/banners/active', new ListActiveBannersController_1.ListActiveBannersController().handle);
+router.put('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new UpdateBannerController_1.UpdateBannerController().handle);
+router.delete('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isAdmin, new DeleteBannerController_1.DeleteBannerController().handle);
