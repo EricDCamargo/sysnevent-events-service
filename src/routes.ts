@@ -17,6 +17,7 @@ import { DeleteBannerController } from './controllers/banner/DeleteBannerControl
 import { ListActiveBannersController } from './controllers/banner/ListActiveBannersController'
 import { ListAllBannersController } from './controllers/banner/ListAllBannersController'
 import { UpdateBannerController } from './controllers/banner/UpdateBannerController'
+import { ToggleBannerStatusController } from './controllers/banner/ToggleBannerStatusController'
 
 const router = Router()
 
@@ -39,5 +40,6 @@ router.get('/banners', isAuthenticated, isCoordinator, new ListAllBannersControl
 router.get('/banners/active', new ListActiveBannersController().handle)
 router.put('/banners', isAuthenticated, isCoordinator, new UpdateBannerController().handle)
 router.delete('/banners', isAuthenticated, isCoordinator, new DeleteBannerController().handle)
+router.patch('/banners/toggle-status', isAuthenticated, isCoordinator, new ToggleBannerStatusController().handle)
 
 export { router }

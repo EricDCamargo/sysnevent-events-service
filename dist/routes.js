@@ -20,6 +20,7 @@ const DeleteBannerController_1 = require("./controllers/banner/DeleteBannerContr
 const ListActiveBannersController_1 = require("./controllers/banner/ListActiveBannersController");
 const ListAllBannersController_1 = require("./controllers/banner/ListAllBannersController");
 const UpdateBannerController_1 = require("./controllers/banner/UpdateBannerController");
+const ToggleBannerStatusController_1 = require("./controllers/banner/ToggleBannerStatusController");
 const router = (0, express_1.Router)();
 exports.router = router;
 router.post('/', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new CreateEventController_1.CreateEventController().handle);
@@ -39,3 +40,4 @@ router.get('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCo
 router.get('/banners/active', new ListActiveBannersController_1.ListActiveBannersController().handle);
 router.put('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new UpdateBannerController_1.UpdateBannerController().handle);
 router.delete('/banners', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new DeleteBannerController_1.DeleteBannerController().handle);
+router.patch('/banners/toggle-status', isAuthenticated_1.isAuthenticated, isAuthenticated_1.isCoordinator, new ToggleBannerStatusController_1.ToggleBannerStatusController().handle);
